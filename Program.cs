@@ -17,24 +17,26 @@ class Program
         if (args.Length == 0)
         {
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-            while (!reader.EndOfStream)
+            try
             {
-                try
+                var records = csv.GetRecords<Cheep>();
+                foreach (var Cheep in records)
                 {
-                    var records = csv.GetRecords<Cheep>();
+                    Cheep.Display();
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred: {ex.Message}");
-                }
+
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+            
         }
         else if (args.Length >= 2 && args[0] == "--cheep")
         {
             string message = string.Join(" ", args, 1, args.Length - 1).Trim('"');
             string author = "CLI User"; // Default author for CLI entries
-            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            long timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             var cheep = new Cheep
             {
