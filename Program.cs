@@ -1,50 +1,69 @@
 ﻿using System;
+using System.ComponentModel.Design;
+using System.Globalization;
 using System.IO;
+using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 
 class Program
+
 {
     static void Main(string[] args)
     {
         string path = "chirp_cli_db.csv"; // Path to your CSV file
-
+        using var reader = new StreamReader(path);
+        
         if (args.Length == 0)
         {
-            try
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            while (!reader.EndOfStream)
             {
-                foreach (var line in File.ReadLines(path))
+                try
                 {
-                    var values = line.Split(',');
-                    // Process values here
-                    Console.WriteLine(string.Join(" | ", values));
+                    var records = csv.GetRecords<Cheep>();
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
             }
         }
         else if (args.Length >= 2 && args[0] == "--cheep")
         {
             string message = string.Join(" ", args, 1, args.Length - 1).Trim('"');
             string author = "CLI User"; // Default author for CLI entries
-            long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            string cheepLine = $"{author},{message},{unixTimestamp}";
+            var cheep = new Cheep
+            {
+                Author = author,
+                Message = message,
+                Timestamp = timestamp
+            };
+
+            using var stream = new StreamWriter(path, append: true);
+            using var csv = new CsvWriter(stream, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false
+            });
 
             try
             {
-                File.AppendAllText(path, cheepLine + Environment.NewLine);
-                Console.WriteLine("Cheep added successfully.");
+                csv.WriteRecord(cheep);
+                csv.NextRecord();
+                Console.WriteLine("Record successfully added!");
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine($"An error occurred while adding the cheep: {ex.Message}");
+                Console.WriteLine($"An error occurred while adding the cheep: {e.Message}");
             }
         }
         else
         {
             Console.WriteLine("Invalid arguments. Use no arguments to read or '--add <entry>' to add a new entry.");
         }
-                   
+
     }
 }
