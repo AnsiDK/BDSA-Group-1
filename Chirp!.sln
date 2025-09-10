@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.CLI", "Chirp.CLI.csproj", "{8EF926D7-64DC-0A6F-F3CC-961C27C4B9C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.CLI", "BDSA-Group-1\Chirp.CLI.csproj", "{E2DF7B49-7B47-D083-8C4E-21BF44245D9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +10,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8EF926D7-64DC-0A6F-F3CC-961C27C4B9C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8EF926D7-64DC-0A6F-F3CC-961C27C4B9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8EF926D7-64DC-0A6F-F3CC-961C27C4B9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8EF926D7-64DC-0A6F-F3CC-961C27C4B9C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2DF7B49-7B47-D083-8C4E-21BF44245D9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2DF7B49-7B47-D083-8C4E-21BF44245D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2DF7B49-7B47-D083-8C4E-21BF44245D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2DF7B49-7B47-D083-8C4E-21BF44245D9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {75E7D554-AACC-4A40-80F9-5C9F2EFC4634}
+		SolutionGuid = {5D6FEC80-F6E8-499D-B696-5080542C4144}
 	EndGlobalSection
 EndGlobal
