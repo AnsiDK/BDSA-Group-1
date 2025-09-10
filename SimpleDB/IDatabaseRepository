@@ -1,25 +1,15 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using System.IO;
-using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.Configuration.Attributes;
-
-class Program
-
+interface IDatabaseRepository<T>
 {
-    static void Main(string[] args)
+
+    public IEnumerable<T> Read(int limit)
     {
         string path = "chirp_cli_db.csv"; // Path to your CSV file
         using var reader = new StreamReader(path);
-        
-        if (args.Length == 0)
-        {
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             try
             {
-                var records = csv.GetRecords<Cheep>();
+                var records = csv.GetRecords<Cheep>().Take(limit);
                 foreach (var Cheep in records)
                 {
                     Cheep.Display();
@@ -30,18 +20,20 @@ class Program
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
-            
-        }
-        else if (args.Length >= 2 && args[0] == "--cheep")
-        {
-            string message = string.Join(" ", args, 1, args.Length - 1).Trim('"');
+
+    }
+
+    public void Store(T record)
+     {
+        string path = "chirp_cli_db.csv"; // Path to your CSV file
+
             string author = "CLI User"; // Default author for CLI entries
             long timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             var cheep = new Cheep
             {
                 Author = author,
-                Message = message,
+                Record = record,
                 Timestamp = timestamp
             };
 
@@ -61,11 +53,5 @@ class Program
             {
                 Console.WriteLine($"An error occurred while adding the cheep: {e.Message}");
             }
-        }
-        else
-        {
-            Console.WriteLine("Invalid arguments. Use no arguments to read or '--add <entry>' to add a new entry.");
-        }
-
     }
 }
