@@ -1,4 +1,4 @@
-interface IDatabaseRepository<T>
+public interface IDatabaseRepository<T>
 {
 
     public IEnumerable<T> Read(int limit)
@@ -10,10 +10,7 @@ interface IDatabaseRepository<T>
             try
             {
                 var records = csv.GetRecords<Cheep>().Take(limit);
-                foreach (var Cheep in records)
-                {
-                    Cheep.Display();
-                }
+                UserInterface.DisplayCheeps(records);
 
             }
             catch (Exception ex)
