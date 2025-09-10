@@ -1,14 +1,12 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Globalization;
 using System.IO;
-using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.Configuration.Attributes;
+//using CsvHelper;
+//using CsvHelper.Configuration;
+//using CsvHelper.Configuration.Attributes;
 using SimpleDB;
 
 class Program
-
 {
     static void Main(string[] args)
     {
@@ -25,8 +23,7 @@ class Program
         }
         else
         {
-            Console.WriteLine("Invalid arguments. Use no arguments to read or '--add <entry>' to add a new entry.");
+            Console.WriteLine("Invalid arguments. Use no arguments to read or '--cheep <message>' to add a new cheep.");
         }
-
     }
 }

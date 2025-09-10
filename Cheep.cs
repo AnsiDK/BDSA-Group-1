@@ -10,4 +10,9 @@ public class Cheep
         Console.Write($"(@{DateTimeOffset.FromUnixTimeSeconds(Timestamp).DateTime})");
         Console.WriteLine($"{Message}");
     }
+
+    public static implicit operator Cheep(Cheep v)
+    {
+        throw new NotImplementedException();
+    }
 }
