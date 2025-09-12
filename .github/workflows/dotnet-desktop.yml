@@ -28,7 +28,7 @@ jobs:
         dotnet-version: 9.0.x
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/Chirp.CLI.csproj
 
     - name: Build
       run: dotnet build src/Chirp.CLI.csproj --configuration Release --no-restore
