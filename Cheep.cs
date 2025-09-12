@@ -11,9 +11,9 @@ public class Cheep
         Console.WriteLine($"{Message}");
     }
 
-    public static implicit operator Cheep(Cheep v)
-    {
-        throw new NotImplementedException();
-    }
+    //public static implicit operator Cheep(Cheep v)
+    //{
+    //    throw new NotImplementedException();
+    //}
     
 }
