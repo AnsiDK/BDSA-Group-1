@@ -1,0 +1,57 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: windows-latest
+            rid: win-x64
+          - os: macos-latest
+            rid: osx-x64
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore src/Chirp.CLI.csproj
+
+    - name: Build
+      run: dotnet build src/Chirp.CLI.csproj --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test src/Chirp.CLI.csproj --configuration Release --no-build --verbosity normal
+
+    - name: Publish single-file executable
+      run: dotnet publish src/Chirp.CLI.csproj -c Release -r ${{ matrix.rid }} -p:PublishSingleFile=true --no-self-contained -o publish/${{ matrix.rid }}
+
+    - name: Zip output
+      if: runner.os != 'Windows'
+      run: |
+        cd publish
+        zip -r ../${{ matrix.rid }}.zip ${{ matrix.rid }}
+    - name: Zip output (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cd publish
+        powershell Compress-Archive -Path ${{ matrix.rid }} -DestinationPath ../${{ matrix.rid }}.zip
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.rid }}
+        path: ./${{ matrix.rid }}.zip

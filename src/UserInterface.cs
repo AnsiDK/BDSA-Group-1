@@ -5,7 +5,7 @@ class UserInterface
     {
         foreach (var line in message)
         {
-            Console.WriteLine(line);
+            Console.WriteLine(line.Message);
         }
     }
 }
