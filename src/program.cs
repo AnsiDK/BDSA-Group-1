@@ -29,12 +29,12 @@ class Program
                 Message = message,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
-            IDatabaseRepository<Cheep> db = new CSVDatabase();
+            IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
             db.Store(cheep);
         }
         else
         {
-            IDatabaseRepository<Cheep> db = new CSVDatabase();
+            IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
             db.Read(10);
         }
 
