@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using DocoptNet;
 using SimpleDB;
+using Microsoft.AspNetCore.Builder;
+
 
 class Program
 {
@@ -49,6 +51,9 @@ class Program
             }
             
         }
+
+        var wa = new WebApp(Build(args));
+        
 
         return 0;
     }
