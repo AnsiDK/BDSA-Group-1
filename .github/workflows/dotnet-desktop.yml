@@ -28,16 +28,16 @@ jobs:
         dotnet-version: 9.0.x
 
     - name: Restore dependencies
-      run: dotnet restore src/Chirp.CLI.csproj
+      run: dotnet restore src/Chirp.CLI/Chirp.CLI.csproj
 
     - name: Build
-      run: dotnet build src/Chirp.CLI.csproj --configuration Release --no-restore
+      run: dotnet build src/Chirp.CLI/Chirp.CLI.csproj --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test src/Chirp.CLI.csproj --configuration Release --no-build --verbosity normal
+      run: dotnet test src/Chirp.CLI/Chirp.CLI.csproj --configuration Release --no-build --verbosity normal
 
     - name: Publish single-file executable
-      run: dotnet publish src/Chirp.CLI.csproj -c Release -r ${{ matrix.rid }} -p:PublishSingleFile=true --no-self-contained -o publish/${{ matrix.rid }}
+      run: dotnet publish src/Chirp.CLI/Chirp.CLI.csproj -c Release -r ${{ matrix.rid }} -p:PublishSingleFile=true --no-self-contained -o publish/${{ matrix.rid }}
 
     - name: Zip output
       if: runner.os != 'Windows'
