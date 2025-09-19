@@ -11,6 +11,7 @@ public static class WebApp
         var builder = WebApplication.CreateBuilder(args);
         var app = builder.Build();
 
+
         app.MapGet("/cheeps", getCheeps);
         app.MapPost("/cheep", (Cheep cheep) => { storeCheep(cheep); });
 
@@ -24,7 +25,9 @@ public static class WebApp
     }
 
     private static void storeCheep(Cheep cheep)
+    
     {
+        
         IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
         db.Store(cheep);
     }

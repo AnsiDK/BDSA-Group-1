@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DocoptNet;
 using SimpleDB;
 using Microsoft.AspNetCore.Builder;
+using Chirp.CLI;
 
 
 class Program
@@ -24,6 +25,7 @@ class Program
 
         if (arguments["cheep"].IsTrue)
         {
+            
             string message = arguments["<message>"].ToString();
             var cheep = new Cheep
             {
@@ -52,7 +54,7 @@ class Program
             
         }
 
-        var wa = new WebApp(Build(args));
+        WebApp.Build(args);
         
 
         return 0;
