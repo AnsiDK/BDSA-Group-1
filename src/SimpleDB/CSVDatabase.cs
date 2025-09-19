@@ -8,7 +8,7 @@ public sealed class CSVDatabase : IDatabaseRepository<Cheep>
 {
     public IEnumerable<Cheep> Read(int limit)
     {   
-        string path = "chirp_cli_db.csv";
+        string path = "src/chirp_cli_db.csv";
         using var reader = new StreamReader(path);
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture));
         try
@@ -26,7 +26,7 @@ public sealed class CSVDatabase : IDatabaseRepository<Cheep>
 
     public void Store(Cheep cheep)
     {
-        string path = "chirp_cli_db.csv";
+        string path = "src/chirp_cli_db.csv";
         using var stream = new StreamWriter(path, append: true);
         using var csv = new CsvWriter(stream, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
