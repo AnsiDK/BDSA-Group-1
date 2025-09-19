@@ -26,7 +26,7 @@ public sealed class CSVDatabase : IDatabaseRepository<Cheep>
         try
         {
             var records = csv.GetRecords<Cheep>().Take(limit).ToList();
-            UserInterface.DisplayMessage(records);
+            //UserInterface.DisplayMessage(records);
             return records;
         }
         catch (Exception ex)

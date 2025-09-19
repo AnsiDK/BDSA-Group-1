@@ -29,13 +29,25 @@ class Program
                 Message = message,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
-            IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
+            IDatabaseRepository<Cheep>? db = CSVDatabase.getInstance();
+            if (db is null)
+            {
+                Console.WriteLine("Database instance could not be created.");
+                return 1;
+            }
+
             db.Store(cheep);
         }
         else
         {
-            IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
-            db.Read(10);
+            IDatabaseRepository<Cheep>? db = CSVDatabase.getInstance();
+        
+            if (db != null)
+            {
+                var records = db.Read(10);
+                UserInterface.DisplayMessage(records.ToList());    
+            }
+            
         }
 
         return 0;
