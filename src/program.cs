@@ -6,14 +6,14 @@ using SimpleDB;
 class Program
 {
     private const string usage = @"
-    Chirp CLI.
+        Chirp CLI.
 
-    Usage:
-    chirp cheep <message>
-    chirp
+        Usage:
+        chirp cheep <message>
+        chirp
 
-    Options:
-    -h --help     Show this screen.
+        Options:
+        -h --help     Show this screen.
     ";
 
     static int Main(string[] args)
@@ -29,12 +29,12 @@ class Program
                 Message = message,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
-            IDatabaseRepository<Cheep> db = new CSVDatabase();
+            IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
             db.Store(cheep);
         }
         else
         {
-            IDatabaseRepository<Cheep> db = new CSVDatabase();
+            IDatabaseRepository<Cheep> db = CSVDatabase.getInstance();
             db.Read(10);
         }
 

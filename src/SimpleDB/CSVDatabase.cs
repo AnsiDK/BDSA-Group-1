@@ -6,6 +6,18 @@ namespace SimpleDB;
 
 public sealed class CSVDatabase : IDatabaseRepository<Cheep>
 {
+    private static CSVDatabase instance;
+
+    private CSVDatabase() { }
+
+    public static CSVDatabase getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new CSVDatabase();
+        }
+        return instance;
+    }
     public IEnumerable<Cheep> Read(int limit)
     {   
         string path = "src/chirp_cli_db.csv";
