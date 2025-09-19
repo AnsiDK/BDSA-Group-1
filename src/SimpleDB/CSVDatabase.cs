@@ -19,14 +19,13 @@ public sealed class CSVDatabase : IDatabaseRepository<Cheep>
         return instance;
     }
     public IEnumerable<Cheep> Read(int limit)
-    {   
-        string path = "src/chirp_cli_db.csv";
+    {
+        string path = "src/Chirp.CLI/chirp_cli_db.csv";
         using var reader = new StreamReader(path);
         using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture));
         try
         {
             var records = csv.GetRecords<Cheep>().Take(limit).ToList();
-            //UserInterface.DisplayMessage(records);
             return records;
         }
         catch (Exception ex)
@@ -34,11 +33,12 @@ public sealed class CSVDatabase : IDatabaseRepository<Cheep>
             Console.WriteLine($"An error occurred: {ex.Message}");
             return Enumerable.Empty<Cheep>();
         }
+        return Enumerable.Empty<Cheep>();
     }
 
     public void Store(Cheep cheep)
     {
-        string path = "src/chirp_cli_db.csv";
+        string path = "src/Chirp.CLI/chirp_cli_db.csv";
         using var stream = new StreamWriter(path, append: true);
         using var csv = new CsvWriter(stream, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
