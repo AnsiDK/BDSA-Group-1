@@ -6,7 +6,7 @@ namespace SimpleDB;
 
 public sealed class CSVDatabase : IDatabaseRepository<Cheep>
 {
-    private static CSVDatabase instance;
+    private static CSVDatabase? instance;
 
     private CSVDatabase() { }
 
@@ -33,7 +33,6 @@ public sealed class CSVDatabase : IDatabaseRepository<Cheep>
             Console.WriteLine($"An error occurred: {ex.Message}");
             return Enumerable.Empty<Cheep>();
         }
-        return Enumerable.Empty<Cheep>();
     }
 
     public void Store(Cheep cheep)
