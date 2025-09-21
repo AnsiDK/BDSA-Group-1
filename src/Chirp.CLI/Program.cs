@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using DocoptNet;
 using SimpleDB;
 using Microsoft.AspNetCore.Builder;
-using Chirp.CLI;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using DocoptNet;
 
 class Program
 {
@@ -16,7 +18,7 @@ class Program
         chirp [--api=<url>]
 
         Options:
-        --api=<url>   API base URL [default: http://localhost:5000]
+        --api=<url>   API base URL [default: http://localhost:5146]
         --author=<name>  Author name [default: <system user>]
         -h --help     Show this screen.
     ";
@@ -34,7 +36,7 @@ class Program
         // Ensure CSV singleton is initialized once with the shared path
         var repo = CSVDatabase.Create(csvPath);
 
-        var apiBase = arguments["--api"]?.ToString() ?? "http://localhost:5000";
+        var apiBase = arguments["--api"]?.ToString() ?? "http://localhost:5146";
 
         var useApi = true;
         using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
@@ -51,7 +53,12 @@ class Program
             {
                 try
                 {
-                    var resp = await http.PostAsJsonAsync("/cheep", new { Author = author, Message = message });
+                    var resp = await http.PostAsJsonAsync("/cheep", new
+                    {
+                        Author = author,
+                        Message = message,
+                        Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                    });
                     if (!resp.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
@@ -115,6 +122,10 @@ class Program
                     var records = db.Read(10);
                     UserInterface.DisplayMessage(records.ToList());
                 }
+            }
+            else if (cheeps != null)
+            {
+                UserInterface.DisplayMessage(cheeps);
             }
         }
         return 0;

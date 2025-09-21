@@ -24,12 +24,13 @@ if (app.Environment.IsDevelopment())
 }
 
 
-// GET /cheeps?limit=10
-app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int limit = 10) =>
+// GET /cheeps (all) or /cheeps?limit=10
+app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit) =>
 {
-    if (limit <= 0 || limit > 100) limit = 10;
-    var cheeps = db.Read(limit);
-    return Results.Ok(cheeps);
+    IEnumerable<Cheep> all = db.ReadAll();
+    if (limit is > 0)
+        all = all.Take(limit.Value);
+    return Results.Ok(all);
 });
 
 // POST /cheep  { "author": "", "message": "" }
@@ -38,11 +39,13 @@ app.MapPost("/cheep", (IDatabaseRepository<Cheep> db, CreateCheepDto dto) =>
     if (string.IsNullOrWhiteSpace(dto.Author) || string.IsNullOrWhiteSpace(dto.Message))
         return Results.BadRequest("Author and Message are required.");
 
+    long ts = (dto.Timestamp is > 0) ? dto.Timestamp.Value : DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
     var cheep = new Cheep
     {
         Author = dto.Author.Trim(),
         Message = dto.Message.Trim(),
-        Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+        Timestamp = ts
     };
     db.Store(cheep);
     return Results.Created("/cheeps", cheep);
@@ -51,4 +54,4 @@ app.MapPost("/cheep", (IDatabaseRepository<Cheep> db, CreateCheepDto dto) =>
 app.Run();
 
 // local DTO for creating a new Cheep
-public record CreateCheepDto(string Author, string Message);
+public record CreateCheepDto(string Author, string Message, long? Timestamp);

@@ -11,6 +11,13 @@ public class CSVDatabase : IDatabaseRepository<Cheep>
     private static CSVDatabase? _instance;
     private static readonly object _lock = new();
 
+    private static readonly CsvConfiguration _csvConfig = new(CultureInfo.InvariantCulture)
+    {
+        HasHeaderRecord = true,
+        MissingFieldFound = null,
+        BadDataFound = null
+    };
+
     private CSVDatabase(string filePath)
     {
         _filePath = filePath;
@@ -39,13 +46,7 @@ public class CSVDatabase : IDatabaseRepository<Cheep>
         try
         {
             using var reader = new StreamReader(_filePath);
-            var cfg = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = false, // Writen without a header, so we tell CsvHelper not to expect one
-                MissingFieldFound = null,
-                BadDataFound = null
-            };
-            using var csv = new CsvReader(reader, cfg);
+            using var csv = new CsvReader(reader, _csvConfig);
             return csv.GetRecords<Cheep>().Take(limit).ToList();
         }
         catch (Exception ex)
@@ -55,26 +56,47 @@ public class CSVDatabase : IDatabaseRepository<Cheep>
         }
     }
 
+    public IEnumerable<Cheep> ReadAll()
+    {
+        EnsureFile();
+        lock (_lock)
+        {
+            if (!File.Exists(_filePath))
+                return Enumerable.Empty<Cheep>();
+
+            using var reader = new StreamReader(_filePath);
+            using var csv = new CsvReader(reader, _csvConfig);
+            return csv.GetRecords<Cheep>().ToList();
+        }
+    }
+
     public void Store(Cheep cheep)
     {
         //string path = "data/chirp_cli_db.csv";
         EnsureFile();
-        try
+        lock (_lock)
         {
-            using var stream = new StreamWriter(_filePath, append: true);
-            var cfg = new CsvConfiguration(CultureInfo.InvariantCulture)
+            try
             {
-                HasHeaderRecord = false // Writen without a header, so we tell CsvHelper not to expect one
-            };
-            using var csv = new CsvWriter(stream, cfg);
-            csv.WriteRecord(cheep);
-            csv.NextRecord();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"An error occurred while adding the cheep: {e.Message}");
+                var fileEmpty = new FileInfo(_filePath).Length == 0;
+                using var stream = new StreamWriter(_filePath, append: true);
+                using var csv = new CsvWriter(stream, _csvConfig);
+
+                if (fileEmpty)
+                {
+                    csv.WriteHeader<Cheep>();
+                    csv.NextRecord();
+                }
+                csv.WriteRecord(cheep);
+                csv.NextRecord();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"An error occurred while adding the cheep: {e.Message}");
+            }
         }
     }
+
     private void EnsureFile()
     {
         var dir = Path.GetDirectoryName(_filePath)!;
