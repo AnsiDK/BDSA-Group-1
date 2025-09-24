@@ -11,7 +11,7 @@ builder.Services.AddOpenApi();
 
 // Build absolute path to solution-level data folder
 var dataDir = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "data"));
-var csvPath = Path.Combine(dataDir, "chirp_cli_db.csv");
+var csvPath = Path.Combine(dataDir, "data/chirp_cli_db.csv");
 
 // Register singleton CSVDatabase instance with the chosen file path
 builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => CSVDatabase.Create(csvPath));
