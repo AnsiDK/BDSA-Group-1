@@ -30,6 +30,9 @@ app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit) =>
     IEnumerable<Cheep> all = db.ReadAll();
     if (limit is > 0)
         all = db.Read(limit.Value);
+    
+    if (all.Length < 1)
+        return Results.NoContent();
     return Results.Ok(all);
 });
 
