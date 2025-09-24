@@ -97,10 +97,11 @@ class Program
                 try
                 {
                     var resp = await http.GetAsync("/cheeps?limit=10");
+                    Console.WriteLine(resp);
                     if (resp.IsSuccessStatusCode)
                     {
                         cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
-                        UserInterface.DisplayMessage(cheeps ?? new List<Cheep>());
+                        UserInterface.DisplayMessage(cheeps);
                     }
                     else
                     {
