@@ -14,7 +14,7 @@ var dataDir = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath,
 var csvPath = Path.Combine(dataDir, "chirp_cli_db.csv");
 
 // Register singleton CSVDatabase instance with the chosen file path
-builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => CSVDatabase.Create(csvPath));
+builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => CSVDatabase.Create("data/chirp_cli_db.csv"));
 
 var app = builder.Build();
 
