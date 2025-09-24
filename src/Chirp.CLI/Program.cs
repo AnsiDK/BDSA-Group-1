@@ -18,7 +18,7 @@ class Program
         chirp [--api=<url>]
 
         Options:
-        --api=<url>   API base URL [default: http://localhost:5146]
+        --api=<url>   API base URL [default: https://bdsagroup1chirpremotedb1.azurewebsites.net/]
         --author=<name>  Author name [default: <system user>]
         -h --help     Show this screen.
     ";
@@ -36,7 +36,7 @@ class Program
         // Ensure CSV singleton is initialized once with the shared path
         var repo = CSVDatabase.Create(csvPath);
 
-        var apiBase = arguments["--api"]?.ToString() ?? "http://localhost:5146";
+        var apiBase = arguments["--api"]?.ToString() ?? "https://bdsagroup1chirpremotedb1.azurewebsites.net/"; //"http://localhost:5146";
 
         var useApi = true;
         using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
