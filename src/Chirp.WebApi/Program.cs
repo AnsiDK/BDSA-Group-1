@@ -6,7 +6,6 @@ using System.IO;
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Logging
-builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 
