@@ -92,42 +92,23 @@ class Program
         {
             List<Cheep>? cheeps = null;
 
-            if (useApi)
+            try
             {
-                try
+                var resp = await http.GetAsync("/cheeps");
+                Console.WriteLine(resp);
+                if (resp.IsSuccessStatusCode)
                 {
-                    var resp = await http.GetAsync("/cheeps");
-                    Console.WriteLine(resp);
-                    if (resp.IsSuccessStatusCode)
-                    {
-                        cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
-                        UserInterface.DisplayMessage(cheeps);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
-                        useApi = false;
-                    }
+                    cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
+                    UserInterface.DisplayMessage(cheeps);
                 }
-                catch (HttpRequestException ex)
+                else
                 {
-                    Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
-                    useApi = false;
+                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
                 }
             }
-
-            if (!useApi)
+            catch (HttpRequestException ex)
             {
-                IDatabaseRepository<Cheep>? db = CSVDatabase.getInstance();
-                if (db != null)
-                {
-                    var records = db.Read(10);
-                    UserInterface.DisplayMessage(records.ToList());
-                }
-            }
-            else if (cheeps != null)
-            {
-                UserInterface.DisplayMessage(cheeps);
+                Console.WriteLine($"API unreachable ({ex.Message}).");
             }
         }
         return 0;
