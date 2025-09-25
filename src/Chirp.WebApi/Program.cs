@@ -30,7 +30,7 @@ if (app.Environment.IsDevelopment())
 
 
 // GET /cheeps (all) or /cheeps?limit=10
-app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit) =>
+app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit, ILogger<Program> logger) =>
 {
     logger.LogInformation("GET /cheeps called. Limit={Limit}", limit);
     IEnumerable<Cheep> all = db.ReadAll();
