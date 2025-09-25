@@ -101,8 +101,14 @@ public class CSVDatabase : IDatabaseRepository<Cheep>
     {
         var dir = Path.GetDirectoryName(_filePath)!;
         if (!Directory.Exists(dir))
+        {
             Directory.CreateDirectory(dir);
+            Console.WriteLine(dir);
+        }
         if (!File.Exists(_filePath))
+        {
             File.Create(_filePath).Dispose();
+            Console.WriteLine(_filePath);
+        }
     }
 }
