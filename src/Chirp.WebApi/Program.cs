@@ -5,6 +5,11 @@ using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 // Minimal API Essentials
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
@@ -27,7 +32,7 @@ if (app.Environment.IsDevelopment())
 // GET /cheeps (all) or /cheeps?limit=10
 app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit) =>
 {
-    Console.WriteLine("Trying to read cheeps from database...");
+    logger.LogInformation("GET /cheeps called. Limit={Limit}", limit);
     IEnumerable<Cheep> all = db.ReadAll();
 
     if (all.Count() < 1)
