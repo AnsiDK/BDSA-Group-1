@@ -96,7 +96,7 @@ class Program
             {
                 try
                 {
-                    var resp = await http.GetAsync("/cheeps?limit=10");
+                    var resp = await http.GetAsync("/cheeps");
                     Console.WriteLine(resp);
                     if (resp.IsSuccessStatusCode)
                     {

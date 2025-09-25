@@ -14,7 +14,7 @@ var dataDir = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath,
 var csvPath = Path.Combine(dataDir, "chirp_cli_db.csv");
 
 // Register singleton CSVDatabase instance with the chosen file path
-builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => CSVDatabase.Create("data/chirp_cli_db.csv"));
+builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => CSVDatabase.Create(csvPath));
 
 var app = builder.Build();
 
@@ -28,11 +28,13 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit) =>
 {
     IEnumerable<Cheep> all = db.ReadAll();
-    if (limit is > 0)
-        all = db.Read(limit.Value);
 
     if (all.Count() < 1)
         return Results.NoContent();
+
+    if (limit is > 0)
+        all = db.Read(limit.Value);
+
     return Results.Ok(all);
 });
 
