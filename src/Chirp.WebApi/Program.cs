@@ -27,10 +27,13 @@ if (app.Environment.IsDevelopment())
 // GET /cheeps (all) or /cheeps?limit=10
 app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit) =>
 {
+    Console.WriteLine("Trying to read cheeps from database...");
     IEnumerable<Cheep> all = db.ReadAll();
 
     if (all.Count() < 1)
         return Results.NoContent();
+    
+    Console.WriteLine("Cheeps found: " + all.Count());
 
     if (limit is > 0)
         all = db.Read(limit.Value);
