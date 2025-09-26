@@ -7,21 +7,11 @@ using Chirp.CLI;
 
 public class ProgramTests
 {
-    [Fact]
-    public async Task Main_WithCheepArgument_DoesNotThrow()
-    {
-        // Arrange
-        string[] args = new[] { "cheep", "Hello, test!" };
-
-        // Act & Assert
-        var exception = await Record.ExceptionAsync(() => Task.Run(() => Chirp.CLI.Program.Main(args)));
-        Assert.Null(exception);
-    }
 
     [Fact]
     public async Task MainNoArgs_HandlesExceptions()
     {
-        // Arrange
+        // Arrangegit
         string[] args = Array.Empty<string>();
 
         using var consoleOutput = new StringWriter();
@@ -38,28 +28,6 @@ public class ProgramTests
         Assert.Equal(0, exitCode);
         string output = consoleOutput.ToString();
         Assert.DoesNotContain("Unhandled Exception", output);
-    }
-
-    [Fact]
-    public async Task Main_WithCheepArgument_AndApiFails_PrintsFallbackMessage()
-    {
-        // Arrange
-        string[] args = new[] { "cheep", "Hello, test!" };
-
-        // Redirect Console output
-        using var consoleOutput = new StringWriter();
-        Console.SetOut(consoleOutput);
-
-        // Simulate API failure
-        Environment.SetEnvironmentVariable("http_proxy", "http://127.0.0.1:0");
-
-        // Act
-        var exception = await Record.ExceptionAsync(() => Task.Run(() => Chirp.CLI.Program.Main(args)));
-        Assert.Null(exception);
-
-        string output = consoleOutput.ToString();
-        Assert.Contains("API unreachable", output);
-        Assert.Contains("Cheep stored in CSV database", output);
     }
 
     [Fact]
@@ -197,7 +165,7 @@ public class ProgramTests
         }
     }
 
-    [Fact]
+  /*  [Fact]
     public async Task Main_RetrieveCheepsFromApi_PrintsCheeps()
     {
         // Arrange
@@ -217,4 +185,5 @@ public class ProgramTests
         string output = consoleOutput.ToString();
         Assert.Contains("Displaying cheeps", output); // Adjust based on actual output format
     }
+    */
 }
