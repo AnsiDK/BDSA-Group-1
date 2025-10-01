@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Builder;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using DocoptNet;
 
-class Program
+namespace Chirp.CLI;
+
+public partial class Program
 {
     private const string usage = @"
         Chirp CLI.
@@ -23,7 +24,7 @@ class Program
         -h --help     Show this screen.
     ";
 
-    static async Task<int> Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         var arguments = new Docopt().Apply(usage, args, exit: true);
 
@@ -36,7 +37,13 @@ class Program
         // Ensure CSV singleton is initialized once with the shared path
         var repo = CSVDatabase.Create(csvPath);
 
-        var apiBase = arguments["--api"]?.ToString() ?? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/"; //"http://localhost:5146";
+        var apiBase = arguments["--api"]?.ToString() ?? "http://localhost:5146";
+
+        // Address nullable warning
+        if (apiBase == null)
+        {
+            throw new InvalidOperationException("API base URL cannot be null.");
+        }
 
         var useApi = true;
         using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
@@ -92,25 +99,64 @@ class Program
         {
             List<Cheep>? cheeps = null;
 
-            try
+            if (useApi)
             {
-                var resp = await http.GetAsync("/cheeps");
-                Console.WriteLine(resp);
-                if (resp.IsSuccessStatusCode)
+                var result = await RetreiveCheeps(http, 10);
+                cheeps = result.Cheeps;
+                useApi = result.UseApi;
+                if (cheeps != null)
                 {
-                    cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
                     UserInterface.DisplayMessage(cheeps);
+
                 }
                 else
                 {
-                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
+                    System.Console.WriteLine("No cheeps retrieved from API.");
                 }
             }
-            catch (HttpRequestException ex)
+
+            if (!useApi)
             {
-                Console.WriteLine($"API unreachable ({ex.Message}).");
+                IDatabaseRepository<Cheep>? db = CSVDatabase.getInstance();
+                if (db != null)
+                {
+                    var records = db.Read(10);
+                    UserInterface.DisplayMessage(records.ToList());
+                }
+            }
+            else if (cheeps != null)
+            {
+                UserInterface.DisplayMessage(cheeps);
             }
         }
         return 0;
+    }
+
+    public static async Task<(List<Cheep>? Cheeps, bool UseApi)> RetreiveCheeps(HttpClient http, int limit = 10)
+    {
+        try
+        {
+            var resp = await http.GetAsync($"/cheeps?limit={limit}");
+            if (resp.IsSuccessStatusCode)
+            {
+                var cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
+                if (cheeps != null)
+                {
+                    Console.WriteLine("Displaying cheeps");
+                    UserInterface.DisplayMessage(cheeps);
+                    return (cheeps, true);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
+        }
+
+        return (null, false); // Return null cheeps and false for useApi if API fails
     }
 }
