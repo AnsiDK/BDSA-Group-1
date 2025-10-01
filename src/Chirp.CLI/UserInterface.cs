@@ -1,13 +1,19 @@
+using System;
+using System.Collections.Generic;
+using Chirp.Models;
 
-class UserInterface
+static class UserInterface
 {
-    public static void DisplayMessage(List<Cheep> message)
+    public static void DisplayMessage(IEnumerable<Cheep> messages)
     {
-        Console.WriteLine("Cheeps:" + message.Count);
-        foreach (var line in message)
+        foreach (var c in messages)
         {
+<<<<<<< HEAD
             Console.WriteLine($"[{line.Timestamp}] {line.Author}:");
             Console.WriteLine(line.Message);
+=======
+            Console.WriteLine(c.Message);
+>>>>>>> Refactoring-to-SQLite-DB
         }
     }
 

@@ -1,3 +1,4 @@
+namespace Chirp.Models;
 public class Cheep
 {
     public required string Author { get; set; }
@@ -15,5 +16,5 @@ public class Cheep
     //{
     //    throw new NotImplementedException();
     //}
-    
+
 }

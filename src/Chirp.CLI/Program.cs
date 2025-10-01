@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using DocoptNet;
-using SimpleDB;
-using Microsoft.AspNetCore.Builder;
+//using Microsoft.AspNetCore.Builder;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Microsoft.Data.Sqlite;
+//using System.IO;
+using SimpleDB;
+using SimpleDB.Mappers;
+using Chirp.Models;
 
 namespace Chirp.CLI;
 
@@ -28,24 +32,22 @@ public partial class Program
     {
         var arguments = new Docopt().Apply(usage, args, exit: true);
 
-        // Resolve solution root and data directory
-        var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
-        var dataDir = Path.Combine(solutionRoot, "data");
-        Directory.CreateDirectory(dataDir);
-        var csvPath = Path.Combine(dataDir, "chirp_cli_db.csv");
+        var SQLite = SQLiteDatabase<Cheep>.Create("chirp.db", new CheepMapper());
+        IDatabaseRepository<Cheep> localDb = SQLiteDatabase<Cheep>.getInstance();
 
-        // Ensure CSV singleton is initialized once with the shared path
-        var repo = CSVDatabase.Create(csvPath);
 
         using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
 
         if (arguments["cheep"].IsTrue)
         {
-            var message = arguments["<message>"]?.ToString() ?? "";
+            var message = arguments["<message>"]?.ToString();
+            apiBaseUrl = string.IsNullOrWhiteSpace(apiBaseUrl) ? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/" : apiBaseUrl;
             var authorRaw = arguments["--author"]?.ToString();
             var author = string.IsNullOrWhiteSpace(authorRaw) || authorRaw == "<system user>"
                 ? Environment.UserName
                 : authorRaw;
+                
+            var ts = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             try
             {
@@ -53,18 +55,16 @@ public partial class Program
                 {
                     Author = author,
                     Message = message,
-                    Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                    Timestamp = ts
                 });
                 if (!resp.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
-                    useApi = false;
+                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
-                useApi = false;
+                Console.WriteLine($"API unreachable ({ex.Message})");
             }
         }
         else
@@ -74,20 +74,22 @@ public partial class Program
             try
             {
                 var resp = await http.GetAsync("/cheeps");
-                Console.WriteLine(resp);
                 if (resp.IsSuccessStatusCode)
                 {
                     cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
-                    UserInterface.DisplayMessage(cheeps);
+                    UserInterface.DisplayMessage(cheeps ?? new List<Chirp.Models.Cheep>());
+
                 }
                 else
                 {
                     Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
+                    cheeps = new List<Cheep>(localDb.ReadAll());
                 }
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"API unreachable ({ex.Message}).");
+                Console.WriteLine($"API unreachable ({ex.Message}). Falling back to SQLite.");
+                cheeps = new List<Cheep>(localDb.ReadAll());
             }
         }
         return 0;
