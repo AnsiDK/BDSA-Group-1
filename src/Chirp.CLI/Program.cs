@@ -35,18 +35,19 @@ public partial class Program
         var SQLite = SQLiteDatabase<Cheep>.Create("chirp.db", new CheepMapper());
         IDatabaseRepository<Cheep> localDb = SQLiteDatabase<Cheep>.getInstance();
 
+        var apiBase = arguments["--api"]?.ToString() ?? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/";
 
         using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
 
         if (arguments["cheep"].IsTrue)
         {
             var message = arguments["<message>"]?.ToString();
-            apiBaseUrl = string.IsNullOrWhiteSpace(apiBaseUrl) ? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/" : apiBaseUrl;
+            //apiBaseUrl = string.IsNullOrWhiteSpace(apiBaseUrl) ? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/" : apiBaseUrl;
             var authorRaw = arguments["--author"]?.ToString();
             var author = string.IsNullOrWhiteSpace(authorRaw) || authorRaw == "<system user>"
                 ? Environment.UserName
                 : authorRaw;
-                
+
             var ts = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             try
