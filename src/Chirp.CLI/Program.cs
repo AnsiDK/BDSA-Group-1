@@ -56,14 +56,12 @@ class Program
                 });
                 if (!resp.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
-                    useApi = false;
+                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}");
                 }
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
-                useApi = false;
+                Console.WriteLine($"API unreachable ({ex.Message})");
             }
         }
         else
