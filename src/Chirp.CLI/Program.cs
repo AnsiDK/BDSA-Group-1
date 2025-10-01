@@ -36,9 +36,6 @@ class Program
         // Ensure CSV singleton is initialized once with the shared path
         var repo = CSVDatabase.Create(csvPath);
 
-        var apiBase = arguments["--api"]?.ToString() ?? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/"; //"http://localhost:5146";
-
-        var useApi = true;
         using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
 
         if (arguments["cheep"].IsTrue)
@@ -49,43 +46,24 @@ class Program
                 ? Environment.UserName
                 : authorRaw;
 
-            if (useApi)
+            try
             {
-                try
-                {
-                    var resp = await http.PostAsJsonAsync("/cheep", new
-                    {
-                        Author = author,
-                        Message = message,
-                        Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-                    });
-                    if (!resp.IsSuccessStatusCode)
-                    {
-                        Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
-                        useApi = false;
-                    }
-                }
-                catch (HttpRequestException ex)
-                {
-                    Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
-                    useApi = false;
-                }
-            }
-
-            if (!useApi)
-            {
-                var cheep = new Cheep
+                var resp = await http.PostAsJsonAsync("/cheep", new
                 {
                     Author = author,
                     Message = message,
                     Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-                };
-                IDatabaseRepository<Cheep>? db = CSVDatabase.getInstance();
-                if (db != null)
+                });
+                if (!resp.IsSuccessStatusCode)
                 {
-                    db.Store(cheep);
-                    Console.WriteLine("Cheep stored in CSV database.");
+                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}. Falling back to CSV.");
+                    useApi = false;
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
+                useApi = false;
             }
         }
         else
