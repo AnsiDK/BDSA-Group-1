@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.IO;
 
-public class SQLiteDatabase<T> : IDatabaseRepository<T> {
+namespace SimpleDB;
+
+public class SQLiteDatabase<T> : IDatabaseRepository<T>
+{
     private readonly string _dbPath;
-    private static SQLiteDatabase<T>? _mapper;
+    private readonly ISQLiteMapper<T>? _mapper;
+    private static SQLiteDatabase<T>? _instance;
     private static readonly object _lock = new();
 
     private SQLiteDatabase(string dbPath, ISQLiteMapper<T> mapper)
@@ -19,7 +23,7 @@ public class SQLiteDatabase<T> : IDatabaseRepository<T> {
         EnsureSchema();
     }
 
-    public static SQLiteDatabase Create(string dbPath, ISQLiteMapper<T> mapper)
+    public static SQLiteDatabase<T> Create(string dbPath, ISQLiteMapper<T> mapper)
     {
         lock (_lock)
         {
@@ -28,15 +32,16 @@ public class SQLiteDatabase<T> : IDatabaseRepository<T> {
         }
     }
 
-    public static SQLiteDatabase getInstance() =>
+    public static SQLiteDatabase<T> getInstance() =>
         _instance ?? throw new InvalidOperationException("SQLiteDatabase not initialized. Call Create(path) first.");
 
-    private void EnsureSchema() {
+    private void EnsureSchema()
+    {
         using var connection = new SqliteConnection(_dbPath);
         connection.Open();
 
         using var cmd = connection.CreateCommand();
-        cmd.CommandText = _mapper.CreateTableSQL; 
+        cmd.CommandText = _mapper.CreateTableSQL;
         cmd.ExecuteNonQuery();
     }
 
@@ -66,13 +71,15 @@ public class SQLiteDatabase<T> : IDatabaseRepository<T> {
         using var cmd = connection.CreateCommand();
         cmd.CommandText = _mapper.SelectAllSQL;
         using var reader = cmd.ExecuteReader();
-        while (reader.Read()) {
+        while (reader.Read())
+        {
             list.Add(_mapper.FromRow(reader));
         }
         return list;
     }
 
-    public void Store(T item) {
+    public void Store(T item)
+    {
         using var connection = new SqliteConnection(_dbPath);
         connection.Open();
 

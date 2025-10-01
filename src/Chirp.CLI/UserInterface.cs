@@ -1,11 +1,14 @@
+using System;
+using System.Collections.Generic;
+using Chirp.Models;
 
-class UserInterface
+static class UserInterface
 {
-    public static void DisplayMessage(List<Cheep> message)
+    public static void DisplayMessage(IEnumerable<Cheep> messages)
     {
-        foreach (var line in message)
+        foreach (var c in messages)
         {
-            Console.WriteLine(line.Message);
+            Console.WriteLine(c.Message);
         }
     }
 }

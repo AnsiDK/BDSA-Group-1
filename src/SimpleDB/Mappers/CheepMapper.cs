@@ -1,8 +1,8 @@
-using System.data;
+using System.Data;
 using Microsoft.Data.Sqlite;
 using Chirp.Models;
 
-namespace SimpleDB;
+namespace SimpleDB.Mappers;
 
 public class CheepMapper : ISQLiteMapper<Cheep> {
     public string CreateTableSQL => @"
@@ -32,10 +32,9 @@ public class CheepMapper : ISQLiteMapper<Cheep> {
     {
         return new Cheep
         {
-            Id = row.GetInt32(0),
-            Author = row.GetString(1),
-            Message = row.GetString(2),
-            Timestamp = row.GetInt64(3)
+            Author = row.GetString(0),
+            Message = row.GetString(1),
+            Timestamp = row.GetInt64(2)
         };
     }
 
