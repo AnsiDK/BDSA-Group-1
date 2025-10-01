@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -55,3 +58,23 @@ jobs:
       with:
         name: ${{ matrix.rid }}
         path: ./${{ matrix.rid }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: main-${{ github.sha }}
+          name: Release for commit ${{ github.sha }}
+          body: |
+            Automated release for commit ${{ github.sha }} on branch main.
+          files: ./artifacts/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
