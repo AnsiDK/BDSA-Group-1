@@ -5,9 +5,10 @@ using DocoptNet;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
-//using Microsoft.Data.Sqlite;
+using Microsoft.Data.Sqlite;
 //using System.IO;
 using SimpleDB;
+using SimpleDB.Mappers;
 using Chirp.Models;
 
 class Program
@@ -36,7 +37,8 @@ class Program
         bool useApi = true; // C# uses "bool" instead of "boolean"
 
         if (arguments["cheep"].IsTrue) {
-            var message = arguments["<message>"]?.ToString() ?? "";
+            var message = arguments["<message>"]?.ToString();
+            apiBaseUrl = string.IsNullOrWhiteSpace(apiBaseUrl) ? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/" : apiBaseUrl;
             var authorRaw = arguments["--author"]?.ToString();
             var author = string.IsNullOrWhiteSpace(authorRaw) || authorRaw == "<system user>"
                 ? Environment.UserName
@@ -70,25 +72,37 @@ class Program
             }
 
                 if (!useApi) {
-                    localDb.Store(new Cheep(author, message, ts));
+                    localDb.Store(new Cheep
+                    {
+                        Author = author,
+                        Message = message,
+                        Timestamp = ts
+                    });
                     Console.WriteLine("Cheep saved locally.");
                 }
             }
             else {
                 List<Cheep>? cheeps = null;
 
-                try {
-                    var resp = await http.GetAsync("/cheeps");
-                    if (resp.IsSuccessStatusCode) {
-                        cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
-                        UserInterface.DisplayMessage(cheeps);
-                    }
-                    else {
-                        Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
-                    }
+            try
+            {
+                var resp = await http.GetAsync("/cheeps");
+                if (resp.IsSuccessStatusCode)
+                {
+                    cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
+                    UserInterface.DisplayMessage(cheeps ?? new List<Chirp.Models.Cheep>());
+
                 }
-                catch (HttpRequestException ex) {
-                    Console.WriteLine($"API unreachable ({ex.Message}). Falling back to SQLite.");
+                else
+                {
+                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
+                    cheeps = new List<Cheep>(localDb.ReadAll());
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API unreachable ({ex.Message}). Falling back to SQLite.");
+                cheeps = new List<Cheep>(localDb.ReadAll());
                 }
             }
             return 0;
