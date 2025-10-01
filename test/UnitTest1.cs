@@ -1,6 +1,5 @@
 ﻿using System;
 using Xunit;
-
 public class ProgramTests
 {
     [Fact]
