@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using DocoptNet;
-using SimpleDB;
 using Microsoft.AspNetCore.Builder;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using DocoptNet;
+using Microsoft.Data.Sqlite;
+using System.IO;
+
 
 class Program
 {
@@ -27,19 +28,32 @@ class Program
     {
         var arguments = new Docopt().Apply(usage, args, exit: true);
 
-        // Resolve solution root and data directory
-        var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
-        var dataDir = Path.Combine(solutionRoot, "data");
-        Directory.CreateDirectory(dataDir);
-        var csvPath = Path.Combine(dataDir, "chirp_cli_db.csv");
+        var apiBaseUrl = arguments["--api"]?.ToString() ?? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/";
+        using var http = new HttpClient { BaseAddress = new Uri(apiBaseUrl) }; // Set base address for HttpClient
+        bool useApi = true; // C# uses "bool" instead of "boolean"
 
-        // Ensure CSV singleton is initialized once with the shared path
-        var repo = CSVDatabase.Create(csvPath);
+        // SQLite setup
+        SQLitePCL.Batteries_V2.Init(); // Initialize SQLite
 
-        var apiBase = arguments["--api"]?.ToString() ?? "https://bdsagroup1chirpremotedb1-axhbcyh6b2h9c5fe.norwayeast-01.azurewebsites.net/"; //"http://localhost:5146";
+        var dbPath = Path.Combine(AppContext.BaseDirectory, "chirp.db"); // Database file path
+        Console.WriteLine($"[SQLite] Using DB at: {dbPath}"); // Log the database path (temporary)
 
-        var useApi = true;
-        using var http = new HttpClient { BaseAddress = new Uri(apiBase) };
+        var connectionString = $"Data Source={dbPath}"; // Connection string
+
+        using var connection = new SqliteConnection(connectionString); // Create connection
+        connection.Open(); // Open connection
+
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = @"
+                CREATE TABLE IF NOT EXISTS Cheeps (
+                    Id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Author    TEXT    NOT NULL,
+                    Message   TEXT    NOT NULL,
+                    Timestamp INTEGER NOT NULL
+                );";
+            command.ExecuteNonQuery();
+        }
 
         if (arguments["cheep"].IsTrue)
         {
@@ -65,52 +79,60 @@ class Program
                         useApi = false;
                     }
                 }
+                    catch (HttpRequestException ex)
+                    {
+                        {
+                            Console.WriteLine($"API unreachable ({ex.Message}). Falling back to SQLite.");
+                            useApi = false;
+                        }
+
+                    }
+                }
+
+                if (!useApi)
+                {
+                    var cheep = new Cheep
+                    {
+                        Author = author,
+                        Message = message,
+                        Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                    };
+
+                    using (var insertCommand = connection.CreateCommand()) 
+                    {
+                        insertCommand.CommandText = @"
+                        INSERT INTO Cheeps (Author, Message, Timestamp)
+                        VALUES ($author, $message, $timestamp);";
+                        insertCommand.Parameters.AddWithValue("$author", cheep.Author);
+                        insertCommand.Parameters.AddWithValue("$message", cheep.Message);
+                        insertCommand.Parameters.AddWithValue("$timestamp", cheep.Timestamp);
+                        insertCommand.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("Cheep saved locally.");
+                }
+            }
+            else
+            {
+                List<Cheep>? cheeps = null;
+
+                try
+                {
+                    var resp = await http.GetAsync("/cheeps");
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
+                        UserInterface.DisplayMessage(cheeps);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
+                    }
+                }
                 catch (HttpRequestException ex)
                 {
-                    Console.WriteLine($"API unreachable ({ex.Message}). Falling back to CSV.");
-                    useApi = false;
+                    Console.WriteLine($"API unreachable ({ex.Message}).");
                 }
             }
-
-            if (!useApi)
-            {
-                var cheep = new Cheep
-                {
-                    Author = author,
-                    Message = message,
-                    Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-                };
-                IDatabaseRepository<Cheep>? db = CSVDatabase.getInstance();
-                if (db != null)
-                {
-                    db.Store(cheep);
-                    Console.WriteLine("Cheep stored in CSV database.");
-                }
-            }
+            return 0;
         }
-        else
-        {
-            List<Cheep>? cheeps = null;
-
-            try
-            {
-                var resp = await http.GetAsync("/cheeps");
-                Console.WriteLine(resp);
-                if (resp.IsSuccessStatusCode)
-                {
-                    cheeps = await resp.Content.ReadFromJsonAsync<List<Cheep>>();
-                    UserInterface.DisplayMessage(cheeps);
-                }
-                else
-                {
-                    Console.WriteLine($"API Error: {resp.StatusCode} {resp.ReasonPhrase}.");
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"API unreachable ({ex.Message}).");
-            }
-        }
-        return 0;
     }
-}
