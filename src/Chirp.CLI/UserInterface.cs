@@ -8,12 +8,7 @@ static class UserInterface
     {
         foreach (var c in messages)
         {
-<<<<<<< HEAD
-            Console.WriteLine($"[{line.Timestamp}] {line.Author}:");
-            Console.WriteLine(line.Message);
-=======
             Console.WriteLine(c.Message);
->>>>>>> Refactoring-to-SQLite-DB
         }
     }
 
