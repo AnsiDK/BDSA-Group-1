@@ -3,18 +3,6 @@ using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using System.IO;
 
-namespace SimpleDB;
-
-public interface ISQLiteMapper<T> {
-    string CreateTableSQL { get; }
-    string SelectAllSQL { get; }
-    string SelectLimitSQL(int limit);
-    string InsertSQL { get; }
-
-    T FromRow(IDataRecord row);
-    void BindInsertParameters(SqliteCommand cmd, T item);
-}
-
 public class SQLiteDatabase<T> : IDatabaseRepository<T> {
     private readonly string _dbPath;
     private static SQLiteDatabase<T>? _mapper;
