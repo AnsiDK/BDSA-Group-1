@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Chirp.WebApi
 {
@@ -20,7 +22,7 @@ namespace Chirp.WebApi
         public DbSet<Cheep> Cheeps { get; set; }
         }
 
-    public class TestWebApplicationFactory : WebApplicationFactory<TProgram> where TProgram : class
+    public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
     {
         protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
         {
