@@ -59,11 +59,12 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'bdsagroup1chirpremotedb1'
+          app-name: 'bdsagroup1chirprazor'
           slot-name: 'Production'
           package: .
 
           
+
 
 
 
