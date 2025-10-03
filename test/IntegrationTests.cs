@@ -1,13 +1,18 @@
+using System.Net;
+using System.Net.Http.Json;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Xunit;
 
 namespace Chirp.IntegratedTests;
 public record CheepCreateRequest(string Author, string Message);
 public record CheepResponse(string Author, string Message, long? Timestamp);
 
-public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class IntegrationTests : IClassFixture<WebApplicationFactory<Chirp.WebApi.Program>>
 {
     private readonly HttpClient _client;
 
-    public IntegrationTests(WebApplicationFactory<Program> factory)
+    public IntegrationTests(WebApplicationFactory<Chirp.WebApi.Program> factory)
     {
         _client = factory.CreateClient();
     }
