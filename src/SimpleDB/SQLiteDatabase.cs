@@ -23,13 +23,15 @@ public class SQLiteDatabase<T> : IDatabaseRepository<T>
         EnsureSchema();
     }
 
-    public static SQLiteDatabase<T> Create(string dbPath, ISQLiteMapper<T> mapper)
+    public static SQLiteDatabase<T> Create(string path, ISQLiteMapper<T> mapper)
     {
+        if (_instance is not null) return _instance;
         lock (_lock)
         {
-            _instance ??= new SQLiteDatabase<T>(dbPath, mapper);
-            return _instance;
+            if (_instance is null)
+                _instance = new SQLiteDatabase<T>(path, mapper);
         }
+        return _instance;
     }
 
     public static SQLiteDatabase<T> getInstance() =>

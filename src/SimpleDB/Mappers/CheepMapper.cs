@@ -28,6 +28,19 @@ public class CheepMapper : ISQLiteMapper<Cheep> {
         INSERT INTO Cheeps (Message, Author, Timestamp) 
         VALUES ($message, $author, $timestamp);";
 
+    public string SelectPageSQL(int pageSize, int offset) => @"
+    SELECT Author, Message, Timestamp
+    FROM Cheeps
+    ORDER BY Id DESC
+    LIMIT $limit OFFSET $offset;";
+
+public string SelectByAuthorPageSQL(int pageSize, int offset) => @"
+    SELECT Author, Message, Timestamp
+    FROM Cheeps
+    WHERE Author = $author
+    ORDER BY Id DESC
+    LIMIT $limit OFFSET $offset;";
+
     public Cheep FromRow(IDataRecord row)
     {
         return new Cheep

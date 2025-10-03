@@ -24,16 +24,16 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build src/Chirp.WebApi/Chirp.WebApi.csproj --configuration Release
+        run: dotnet build src/Chirp.Razor/Chirp.Razor.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish src/Chirp.WebApi/Chirp.WebApi.csproj -c Release -o "./publish"
+        run: src/Chirp.Razor/Chirp.Razor.csproj -c Release -o "./publish"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./publish
+          path: .
 
   deploy:
     runs-on: windows-latest
@@ -59,9 +59,14 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'bdsagroup1chirpremotedb1'
+          app-name: 'bdsagroup1chirprazor'
           slot-name: 'Production'
-          package: ./publish
+          package: .
 
           
+
+
+
+
+
 
