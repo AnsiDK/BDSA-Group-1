@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./publish
+          path: .
 
   deploy:
     runs-on: windows-latest
@@ -61,9 +61,10 @@ jobs:
         with:
           app-name: 'bdsagroup1chirpremotedb1'
           slot-name: 'Production'
-          package: ./publish
+          package: .
 
           
+
 
 
 
