@@ -1,9 +1,22 @@
+using Chirp.Models;
+using SimpleDB;
+using SimpleDB.Mappers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<ICheepService, CheepService>();
 
+// Build absolute path to solution-level data folder
+var dataDir = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "data"));
+var dbPath = Path.Combine(dataDir, "chirp_cli_db.db");
+
+// Create (singleton) database repository
+builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ =>
+    SQLiteDatabase<Cheep>.Create(dbPath, new CheepMapper()));
+
+// CheepService depends on the repository
+builder.Services.AddScoped<ICheepService, CheepService>();
 
 var app = builder.Build();
 
