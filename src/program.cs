@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DocoptNet;
 using SimpleDB;
 
-class Program
+public class Program
 {
     private const string usage = @"
     Chirp CLI.

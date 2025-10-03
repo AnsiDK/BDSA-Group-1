@@ -1,13 +1,15 @@
+using Chirp.LocalServer;
 
 namespace Chirp.IntegratedTests;
+
 public record CheepCreateRequest(string Author, string Message);
 public record CheepResponse(string Author, string Message, long? Timestamp);
 
-public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class IntegrationTests : IClassFixture<TestWebApplicationFactory>
 {
     private readonly HttpClient _client;
 
-    public IntegrationTests(WebApplicationFactory<Program> factory)
+    public IntegrationTests(TestWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
     }
