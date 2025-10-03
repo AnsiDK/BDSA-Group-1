@@ -35,9 +35,6 @@ app.MapGet("/cheeps", (IDatabaseRepository<Cheep> db, int? limit, ILogger<Progra
 {
     logger.LogInformation("GET /cheeps called. Limit={Limit}", limit);
     IEnumerable<Cheep> all = db.ReadAll();
-
-    if (all.Count() < 1)
-        return Results.NoContent();
     
     Console.WriteLine("Cheeps found: " + all.Count());
 

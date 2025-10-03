@@ -14,12 +14,12 @@ public class CheepMapper : ISQLiteMapper<Cheep> {
         );";
 
     public string SelectAllSQL => @"
-        SELECT Id, Message, Author, Timestamp 
+        SELECT Author, Message, Timestamp 
         FROM Cheeps 
         ORDER BY Id DESC;";
 
     public string SelectLimitSQL(int limit) => $@"
-        SELECT Id, Message, Author, Timestamp 
+        SELECT Author, Message, Timestamp 
         FROM Cheeps 
         ORDER BY Id DESC 
         LIMIT $limit;";

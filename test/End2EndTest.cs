@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Chirp.E2E;
 
@@ -49,10 +50,15 @@ public class E2ECollection : ICollectionFixture<TestFixture> { }
 public class End2EndTests
 {
     private readonly HttpClient _client;
+    private readonly ITestOutputHelper _output;
     private const string CheepsListRoute = "/cheeps";
     private const string SingleCheepPostRoute = "/cheep";
 
-    public End2EndTests(TestFixture fx) => _client = fx.Client;
+    public End2EndTests(TestFixture fx, ITestOutputHelper output)
+    {
+        _client = fx.Client;
+        _output = output;
+    }
 
     [Fact(DisplayName = "Create a cheep then list contains it")]
     public async Task Create_Then_List()
@@ -61,13 +67,21 @@ public class End2EndTests
         var author = $"e2e_{marker}";
         var message = $"Hello E2E {marker}";
 
+        _output.WriteLine($"POST author={author} message={message}");
+
         var postResp = await _client.PostAsJsonAsync(SingleCheepPostRoute,
             new CheepCreateRequest(author, message));
+        _output.WriteLine($"POST Status={(int)postResp.StatusCode} Body={await postResp.Content.ReadAsStringAsync()}");
         
         postResp.StatusCode.Should().Be(HttpStatusCode.Created);
+        _output.WriteLine("POST Location: " + postResp.Headers.Location);
 
         var listResp = await _client.GetAsync(CheepsListRoute);
         listResp.EnsureSuccessStatusCode();
+
+        var rawList = await listResp.Content.ReadAsStringAsync();
+        _output.WriteLine("RAW LIST JSON: " + rawList);
+
         var items = await listResp.Content.ReadFromJsonAsync<CheepResponse[]>();
         items.Should().NotBeNull();
         items!.Any(c => c.Author == author && c.Message == message).Should().BeTrue();

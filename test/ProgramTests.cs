@@ -78,7 +78,7 @@ public class ProgramTests
     }
 
     [Fact]
-    public async Task Main_CheepWithSpecificAuthor_StoresCorrectAuthor()
+    public async Task Main_CheepWithSpecificAuthor_StoresCorrectAuthor() // This test should be deleted
     {
         // Arrange
         string[] args = new[] { "cheep", "Hello, test!", "--author=TestAuthor" };
