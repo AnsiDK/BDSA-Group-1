@@ -14,19 +14,19 @@ public class CheepMapper : ISQLiteMapper<Cheep> {
         );";
 
     public string SelectAllSQL => @"
-        SELECT Id, Author, Message, Timestamp 
+        SELECT Id, Message, Author, Timestamp 
         FROM Cheeps 
         ORDER BY Id DESC;";
 
     public string SelectLimitSQL(int limit) => $@"
-        SELECT Id, Author, Message, Timestamp 
+        SELECT Id, Message, Author, Timestamp 
         FROM Cheeps 
         ORDER BY Id DESC 
         LIMIT $limit;";
 
     public string InsertSQL => @"
-        INSERT INTO Cheeps (Author, Message, Timestamp) 
-        VALUES ($author, $message, $timestamp);";
+        INSERT INTO Cheeps (Message, Author, Timestamp) 
+        VALUES ($message, $author, $timestamp);";
 
     public Cheep FromRow(IDataRecord row)
     {

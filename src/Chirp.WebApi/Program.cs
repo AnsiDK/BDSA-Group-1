@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.OpenApi;
 using SimpleDB;
 using System.IO;
+using Chirp.Models;
+using SimpleDB.Mappers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,10 +17,10 @@ builder.Services.AddOpenApi();
 
 // Build absolute path to solution-level data folder
 var dataDir = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "data"));
-var csvPath = Path.Combine(dataDir, "chirp_cli_db.csv");
+var dbPath = Path.Combine(dataDir, "chirp_cli_db.db");
 
 // Register singleton CSVDatabase instance with the chosen file path
-builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => CSVDatabase.Create(csvPath));
+builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ => SQLiteDatabase<Cheep>.Create(dbPath, new CheepMapper()));
 
 var app = builder.Build();
 
