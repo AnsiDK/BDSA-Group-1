@@ -24,10 +24,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build dotnet build src/Chirp.RazorPages/Chirp.RazorPages.csproj --configuration Release
+        run: dotnet build dotnet build src/Chirp.Razor/Chirp.Razor.csproj --configuration Release
 
       - name: dotnet publish
-        run: src/Chirp.RazorPages/Chirp.RazorPages.csproj -c Release -o "./publish"
+        run: src/Chirp.Razor/Chirp.Razor.csproj -c Release -o "./publish"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -64,5 +64,6 @@ jobs:
           package: ./publish
 
           
+
 
 
