@@ -1,12 +1,3 @@
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit;
 
 namespace Chirp.IntegratedTests;
 public record CheepCreateRequest(string Author, string Message);

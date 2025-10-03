@@ -73,5 +73,5 @@ public record CreateCheepDto(string Author, string Message, long? Timestamp);
 // Needed for WebApplicationFactory in integration tests
 namespace Chirp.WebApi
 {
-    public partial class Program { }
+    public class Program { }
 }
