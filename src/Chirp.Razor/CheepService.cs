@@ -1,0 +1,42 @@
+public record CheepViewModel(string Author, string Message, string Timestamp);
+
+public interface ICheepService
+{
+    public List<CheepViewModel> GetCheeps(int page = 1, int pageSize = 32);
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int page = 1, int pageSize = 32);
+}
+
+public class CheepService : ICheepService
+{
+    // These would normally be loaded from a database for example
+    private static readonly List<CheepViewModel> _cheeps = new()
+        {
+            new CheepViewModel("Helge", "Hello, BDSA students!", UnixTimeStampToDateTimeString(1690892208)),
+            new CheepViewModel("Adrian", "Hej, velkommen til kurset.", UnixTimeStampToDateTimeString(1690895308)),
+        };
+
+    public List<CheepViewModel> GetCheeps(int page = 1, int pageSize = 32)
+    {
+        return _cheeps
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    public List<CheepViewModel> GetCheepsFromAuthor(string author, int page = 1, int pageSize = 32)
+    {
+        return _cheeps
+            .Where(x => x.Author == author)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private static string UnixTimeStampToDateTimeString(double unixTimeStamp)
+    {
+        // Unix timestamp is seconds past epoch
+        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        dateTime = dateTime.AddSeconds(unixTimeStamp);
+        return dateTime.ToString("MM/dd/yy H:mm:ss");
+    }
+}
