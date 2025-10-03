@@ -1,20 +1,17 @@
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebApplicationFactory;
 
 namespace Chirp.LocalServer;
 
-public class TestWebApplicationFactory : WebApplicationFactory<Program>
+public class TestWebApplicationFactory : WebApplicationFactory<Chirp.WebApi.Program>
 {
+    private IHost? _host;
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
-        {
-            services.AddSingleton<IMyService, MockMyService>();
-        });
-        return base.CreateHost(builder);
+        _host = base.CreateHost(builder);
+        return _host;
     }
-    public IHost GetHost() => _host ?? throw new InvalidOperationException("Host has not been created yet.");
 
+    public IHost GetHost() => _host ?? throw new InvalidOperationException("Host has not been created yet.");
 }
