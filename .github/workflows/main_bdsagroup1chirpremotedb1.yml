@@ -24,7 +24,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build dotnet build src/Chirp.Razor/Chirp.Razor.csproj --configuration Release
+        run: dotnet build src/Chirp.Razor/Chirp.Razor.csproj --configuration Release
 
       - name: dotnet publish
         run: src/Chirp.Razor/Chirp.Razor.csproj -c Release -o "./publish"
@@ -64,6 +64,7 @@ jobs:
           package: ./publish
 
           
+
 
 
 
