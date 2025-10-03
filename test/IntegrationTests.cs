@@ -1,3 +1,4 @@
+using Chirp.LocalServer;
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 
 namespace Chirp.IntegratedTests;
+
 public record CheepCreateRequest(string Author, string Message);
 public record CheepResponse(string Author, string Message, long? Timestamp);
 
