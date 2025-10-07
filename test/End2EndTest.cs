@@ -122,7 +122,7 @@ public class End2EndTests
     [Fact(DisplayName = "Adrian's timeline HTML contains Adrian's cheep")]
     public async Task AdrianTimeline_HtmlContainsAdrianCheep()
     {
-        var resp = await _client.GetAsnc("/Adrian");
+        var resp = await _client.GetAsync("/Adrian");
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var html = await resp.Content.ReadAsStringAsync();
