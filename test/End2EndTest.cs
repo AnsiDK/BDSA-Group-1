@@ -72,7 +72,7 @@ public class End2EndTests
         var postResp = await _client.PostAsJsonAsync(SingleCheepPostRoute,
             new CheepCreateRequest(author, message));
         _output.WriteLine($"POST Status={(int)postResp.StatusCode} Body={await postResp.Content.ReadAsStringAsync()}");
-        
+
         postResp.StatusCode.Should().Be(HttpStatusCode.Created);
         _output.WriteLine("POST Location: " + postResp.Headers.Location);
 
@@ -102,9 +102,31 @@ public class End2EndTests
     public async Task List_Cheeps()
     {
         var resp = await _client.GetAsync(CheepsListRoute);
-        
+
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
         var raw = await resp.Content.ReadAsStringAsync();
         raw.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact(DisplayName = "Public time HTML contains Helge's cheep")]
+    public async Task PublicTimeline_HtmlContainsHelgeCheep()
+    {
+        var resp = await _client.GetAsync("/");
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var html = await resp.Content.ReadAsStringAsync();
+        html.Should().Contain("Helge");
+        html.Should().Contain("Hello, BDSA students!");
+    }
+
+    [Fact(DisplayName = "Adrian's timeline HTML contains Adrian's cheep")]
+    public async Task AdrianTimeline_HtmlContainsAdrianCheep()
+    {
+        var resp = await _client.GetAsync("/Adrian");
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var html = await resp.Content.ReadAsStringAsync();
+        html.Should().Contain("Adrian");
+        html.Should().Contain("Hej, velkommen til kurset.");
     }
 }
