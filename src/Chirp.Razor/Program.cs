@@ -23,6 +23,7 @@ builder.Services.AddDbContext<ChirpDbContext>(options =>
 
 // App services
 builder.Services.AddScoped<ICheepService, CheepService>();
+builder.Services.AddScoped<Chirp.Razor.Repositories.ICheepRepository, Chirp.Razor.Repositories.CheepRepository>();
 
 var app = builder.Build();
 

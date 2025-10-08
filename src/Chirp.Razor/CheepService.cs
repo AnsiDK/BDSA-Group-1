@@ -12,25 +12,22 @@ public interface ICheepService
 
 public class CheepService : ICheepService
 {
-    private readonly ChirpDbContext _db;
+    // private readonly ChirpDbContext _db;
+    private readonly Chirp.Razor.Repositories.ICheepRepository _repo;
 
-    public CheepService(ChirpDbContext db)
+    public CheepService(Chirp.Razor.Repositories.ICheepRepository repo)
     {
-        _db = db;
+        // _db = db;
+        _repo = repo;
     }
 
     public List<CheepViewModel> GetCheeps(int page = 1, int pageSize = 32)
     {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 32;
+        // if (page < 1) page = 1;
+        // if (pageSize < 1) pageSize = 32;
 
-        return _db.Cheeps
-            .AsNoTracking()
-            .Include(c => c.Author)
-            .OrderByDescending(c => c.Timestamp)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(c => new CheepViewModel(
+        var items = _repo.GetCheeps(page, pageSize);
+        return items.Select(c => new CheepViewModel(
                 c.Author.Name,
                 c.Text,
                 FormatTs(c.Timestamp)))
@@ -39,19 +36,13 @@ public class CheepService : ICheepService
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author, int page = 1, int pageSize = 32)
     {
-        if (string.IsNullOrWhiteSpace(author)) return new();
+        // if (string.IsNullOrWhiteSpace(author)) return new();
 
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 32;
+        // if (page < 1) page = 1;
+        // if (pageSize < 1) pageSize = 32;
 
-        return _db.Cheeps
-            .AsNoTracking()
-            .Include(c => c.Author)
-            .Where(c => c.Author.Name == author)
-            .OrderByDescending(c => c.Timestamp)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(c => new CheepViewModel(
+        var items = _repo.GetCheepsFromAuthor(author, page, pageSize);
+        return items.Select(c => new CheepViewModel(
                 c.Author.Name,
                 c.Text,
                 FormatTs(c.Timestamp)))
@@ -59,5 +50,5 @@ public class CheepService : ICheepService
     }
 
     private static string FormatTs(DateTime dtUtc)
-        => dtUtc.ToUniversalTime().ToString("MM/dd/yy H:mm:ss");
+        => dtUtc.ToUniversalTime().ToString("dd/mm/yy H:mm:ss");
 }
