@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
-
+/*
 namespace Chirp.LocalServer;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Chirp.WebApi.Program>
@@ -15,3 +15,4 @@ public class TestWebApplicationFactory : WebApplicationFactory<Chirp.WebApi.Prog
 
     public IHost GetHost() => _host ?? throw new InvalidOperationException("Host has not been created yet.");
 }
+*/

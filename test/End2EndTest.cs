@@ -18,23 +18,29 @@ public record CheepResponse(string Author, string Message, long? Timestamp);
 // Shared fixture
 public class TestFixture : IDisposable
 {
-    private readonly WebApplicationFactory<Program>? _factory;
+    private readonly WebApplicationFactory<Program> _factory;
     public HttpClient Client { get; }
 
     public TestFixture()
+{
+    // Full path to the example database
+    var exampleDb = Path.GetFullPath(Path.Combine("..","..", "data", "chirp_cli_db.db"));
+
+    // Make sure the file exists
+    if (!File.Exists(exampleDb))
+        throw new FileNotFoundException("Cannot find example database", exampleDb);
+
+    // Tell the app to use it
+    Environment.SetEnvironmentVariable("CHIRPDBPATH", exampleDb);
+
+    // Create the test server
+    _factory = new WebApplicationFactory<Program>();
+    Client = _factory.CreateClient(new WebApplicationFactoryClientOptions
     {
-        var external = Environment.GetEnvironmentVariable("TEST_BASEURL");
-        if (!string.IsNullOrWhiteSpace(external))
-        {
-            Client = new HttpClient { BaseAddress = new Uri(external) };
-        }
-        else
-        {
-            // Use in-process hosting
-            _factory = new WebApplicationFactory<Program>();
-            Client = _factory.CreateClient();
-        }
-    }
+        BaseAddress = new Uri("http://localhost")
+    });
+}
+
 
     public void Dispose()
     {
@@ -43,11 +49,12 @@ public class TestFixture : IDisposable
     }
 }
 
+
 [CollectionDefinition("E2E")]
 public class E2ECollection : ICollectionFixture<TestFixture> { }
 
 [Collection("E2E")]
-public class End2EndTests
+public class End2EndTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
     private readonly ITestOutputHelper _output;
