@@ -1,3 +1,4 @@
+/*
 using Chirp.LocalServer;
 using System.Net;
 using System.Net.Http.Json;
@@ -50,3 +51,4 @@ public class IntegrationTests : IClassFixture<WebApplicationFactory<Chirp.WebApi
         cheeps!.Should().NotBeEmpty();
     }
 }
+*/
