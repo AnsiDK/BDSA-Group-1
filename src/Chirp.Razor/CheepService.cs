@@ -42,7 +42,7 @@ public class CheepService : ICheepService
             .ToList();
     }
 
-    public List<CheepViewModel> GetCheepsFromAuthor(string author, int page = 1, int pageSize = 32)
+    public List<CheepDTO> GetCheepsFromAuthor(string author, int page = 1, int pageSize = 32)
     {
         // if (string.IsNullOrWhiteSpace(author)) return new();
 
@@ -50,7 +50,7 @@ public class CheepService : ICheepService
         // if (pageSize < 1) pageSize = 32;
 
         var items = _repo.GetCheepsFromAuthor(author, page, pageSize);
-        return items.Select(c => new CheepViewModel(
+        return items.Select(c => new CheepDTO(
                 c.Author.Name,
                 c.Text,
                 FormatTs(c.Timestamp)))
@@ -58,5 +58,5 @@ public class CheepService : ICheepService
     }
 
     private static string FormatTs(DateTime dtUtc)
-        => dtUtc.ToUniversalTime().ToString("dd/mm/yy H:mm:ss");
+        => dtUtc.ToUniversalTime().ToString("dd/MM/yy HH:mm:ss");
 }
