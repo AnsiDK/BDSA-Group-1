@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 //public record CheepViewModel(string Author, string Message, string Timestamp);
 
+/*
 public class CheepDTO
 {
     public int Id { get; set; }
@@ -11,6 +12,8 @@ public class CheepDTO
     public int AuthorId { get; set; }
     public string AuthorName { get; set; } = null!;
 }
+
+*/
 
 public interface ICheepService
 {
