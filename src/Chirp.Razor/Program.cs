@@ -31,6 +31,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
     db.Database.Migrate();
+
+    DbInitializer.Initialize(db);
 }
 
 // Pipeline
