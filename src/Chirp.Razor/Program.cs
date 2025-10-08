@@ -1,18 +1,9 @@
-using Chirp.Models;
-using SimpleDB;
-using SimpleDB.Mappers;
+using Chirp.Razor.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
-
-// Build absolute path to solution-level data folder
-/*
-var dataDir = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "data"));
-var dbPath = Path.Combine(dataDir, "chirp_cli_db.db");
-*/
-
+// Resolve DB path from env or fallback to temp
 var overridePath = Environment.GetEnvironmentVariable("CHIRPDBPATH");
 var dbPath = string.IsNullOrWhiteSpace(overridePath)
     ? Path.Combine(Path.GetTempPath(), "chirp.db")
@@ -21,31 +12,36 @@ var dbPath = string.IsNullOrWhiteSpace(overridePath)
 // Make sure directory exists
 Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
-// Register the database repository (this calls Create, so getInstance is NOT needed)
-builder.Services.AddSingleton<IDatabaseRepository<Cheep>>(_ =>
+// Services
+builder.Services.AddRazorPages();
+
+// EF Core with SQLite
+builder.Services.AddDbContext<ChirpDbContext>(options =>
 {
-    Console.WriteLine($"[Startup] Using SQLite DB at: {dbPath}");
-    return SQLiteDatabase<Cheep>.Create(dbPath, new CheepMapper());
+    options.UseSqlite($"Data Source={dbPath}");
 });
 
-// CheepService depends on the repository
+// App services
 builder.Services.AddScoped<ICheepService, CheepService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Apply pending migrations automatically (or switch to EnsureCreated for a quick start)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+    db.Database.Migrate();
+}
+
+// Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.MapRazorPages();
-
 app.Run();
