@@ -23,15 +23,17 @@ public class TestFixture : IDisposable
 
     public TestFixture()
 {
-    // Full path to the example database
-    var exampleDb = Path.GetFullPath(Path.Combine("..","..", "data", "chirp_cli_db.db"));
+    //Make the file only find the dump. Do 2 calls for each of the schema, and copy it inside
+        // Full path to the example database
+        var dbPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../data/chirp_cli_db.db"));
+        Environment.SetEnvironmentVariable("CHIRPDBPATH", dbPath);
 
-    // Make sure the file exists
-    if (!File.Exists(exampleDb))
-        throw new FileNotFoundException("Cannot find example database", exampleDb);
 
-    // Tell the app to use it
-    Environment.SetEnvironmentVariable("CHIRPDBPATH", exampleDb);
+        // Make sure the file exists and print where it's looking for the file
+        Console.WriteLine($"[E2E Test] Looking for the path: {dbPath}");
+        if (!File.Exists(dbPath))
+            throw new FileNotFoundException("Cannot find example database", dbPath);
+
 
     // Create the test server
     _factory = new WebApplicationFactory<Program>();
@@ -48,6 +50,7 @@ public class TestFixture : IDisposable
         _factory?.Dispose();
     }
 }
+
 
 
 [CollectionDefinition("E2E")]
@@ -76,8 +79,14 @@ public class End2EndTests : IClassFixture<WebApplicationFactory<Program>>
 
         _output.WriteLine($"POST author={author} message={message}");
 
-        var postResp = await _client.PostAsJsonAsync(SingleCheepPostRoute,
-            new CheepCreateRequest(author, message));
+        var formContent = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("Author", author),
+            new KeyValuePair<string, string>("Message", message)
+        });
+        var postResp = await _client.PostAsync($"/{author}", formContent);
+        postResp.StatusCode.Should().Be(HttpStatusCode.Redirect);
+
         _output.WriteLine($"POST Status={(int)postResp.StatusCode} Body={await postResp.Content.ReadAsStringAsync()}");
 
         postResp.StatusCode.Should().Be(HttpStatusCode.Created);
