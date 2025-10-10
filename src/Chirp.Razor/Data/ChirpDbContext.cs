@@ -14,7 +14,7 @@ public class ChirpDbContext : DbContext
     {
         modelBuilder.Entity<Author>(b =>
         {
-            b.HasKey(a => a.Id);
+            b.HasKey(a => a.AuthorId);
             b.Property(a => a.Name).IsRequired().HasMaxLength(64);
             b.Property(a => a.Email).IsRequired().HasMaxLength(256);
             b.HasIndex(a => a.Name).IsUnique();
@@ -28,7 +28,7 @@ public class ChirpDbContext : DbContext
 
         modelBuilder.Entity<Cheep>(b =>
         {
-            b.HasKey(c => c.Id);
+            b.HasKey(c => c.CheepId);
             b.Property(c => c.Text).IsRequired().HasMaxLength(280);
 
             // Ensure DateTime is tracked as UTC
