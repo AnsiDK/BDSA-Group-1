@@ -9,6 +9,12 @@ var dbPath = string.IsNullOrWhiteSpace(overridePath)
     ? Path.Combine(Path.GetTempPath(), "chirp.db")
     : Path.GetFullPath(overridePath);
 
+// Delete the database file if it exists
+if (File.Exists(dbPath))
+{
+    File.Delete(dbPath);
+}
+
 // Make sure directory exists
 Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
