@@ -61,5 +61,5 @@ public class CheepService : ICheepService
     }
 
     private static string FormatTs(DateTime dtUtc)
-        => dtUtc.ToUniversalTime().ToString("dd/MM/yy HH:mm:ss");
+        => dtUtc.ToUniversalTime().ToString("HH:mm:ss dd/MM/yy");
 }
