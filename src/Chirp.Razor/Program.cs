@@ -37,6 +37,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+    Console.WriteLine($"[DEBUG] EF is using database at: {dbPath}");
     db.Database.Migrate();
 
     DbInitializer.SeedDatabase(db);
@@ -54,3 +55,5 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapRazorPages();
 app.Run();
+
+public partial class Program { } //For testing
