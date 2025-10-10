@@ -1,9 +1,10 @@
 using System;
+using Microsoft.EntityFrameworkCore;
 using Chirp.Razor.Models;
 using Chirp.Razor.Data;
 public static class DbInitializer
 {
-    public static void SeedDatabase(global::Chirp.Razor.Data.ChirpDbContext db)
+    public static void SeedDatabase(ChirpDbContext db)
     {
         db.Database.Migrate();
 
@@ -696,9 +697,9 @@ public static class DbInitializer
             a11.Cheeps = new List<Cheep>() { c656 };
             a12.Cheeps = new List<Cheep>() { c657 };
 
-            ChirpDbContext.Authors.AddRange(authors);
-            ChirpDbContext.Cheeps.AddRange(cheeps);
-            ChirpDbContext.SaveChanges();
+            db.Authors.AddRange(authors);
+            db.Cheeps.AddRange(cheeps);
+            db.SaveChanges();
         }
     }
 }
