@@ -1,6 +1,7 @@
 using Chirp.Razor.Data;
 using Chirp.Razor.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 //public record CheepViewModel(string Author, string Message, string Timestamp);
 
@@ -61,5 +62,6 @@ public class CheepService : ICheepService
     }
 
     private static string FormatTs(DateTime dtUtc)
-        => dtUtc.ToUniversalTime().ToString("HH:mm:ss dd/MM/yy");
+        => dtUtc.ToUniversalTime().ToString("HH:mm:ss MMM dd yyyy", CultureInfo.InvariantCulture); // MMM = Oct, MMMM = October, yyyy = 2025, yy = 25
+
 }
