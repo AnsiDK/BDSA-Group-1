@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Chirp.CLI.csproj",
+                "${workspaceFolder}/Chirp!.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Chirp.CLI.csproj",
+                "${workspaceFolder}/src/Chirp.Web/Chirp.Web.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Chirp.CLI.csproj"
+                "${workspaceFolder}/src/Chirp.Web/Chirp.Web.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

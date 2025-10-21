@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -10,10 +9,6 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Chirp.E2E;
-
-// DTOs
-public record CheepCreateRequest(string Author, string Message);
-public record CheepResponse(string Author, string Message, long? Timestamp);
 
 // Shared fixture
 public class TestFixture : IDisposable
@@ -51,8 +46,6 @@ public class End2EndTests
 {
     private readonly HttpClient _client;
     private readonly ITestOutputHelper _output;
-    private const string CheepsListRoute = "/cheeps";
-    private const string SingleCheepPostRoute = "/cheep";
 
     public End2EndTests(TestFixture fx, ITestOutputHelper output)
     {
@@ -60,55 +53,7 @@ public class End2EndTests
         _output = output;
     }
 
-    [Fact(DisplayName = "Create a cheep then list contains it")]
-    public async Task Create_Then_List()
-    {
-        var marker = Guid.NewGuid().ToString("N");
-        var author = $"e2e_{marker}";
-        var message = $"Hello E2E {marker}";
-
-        _output.WriteLine($"POST author={author} message={message}");
-
-        var postResp = await _client.PostAsJsonAsync(SingleCheepPostRoute,
-            new CheepCreateRequest(author, message));
-        _output.WriteLine($"POST Status={(int)postResp.StatusCode} Body={await postResp.Content.ReadAsStringAsync()}");
-
-        postResp.StatusCode.Should().Be(HttpStatusCode.Created);
-        _output.WriteLine("POST Location: " + postResp.Headers.Location);
-
-        var listResp = await _client.GetAsync(CheepsListRoute);
-        listResp.EnsureSuccessStatusCode();
-
-        var rawList = await listResp.Content.ReadAsStringAsync();
-        _output.WriteLine("RAW LIST JSON: " + rawList);
-
-        var items = await listResp.Content.ReadFromJsonAsync<CheepResponse[]>();
-        items.Should().NotBeNull();
-        items!.Any(c => c.Author == author && c.Message == message).Should().BeTrue();
-    }
-
-    [Theory(DisplayName = "Invalid payload returns 400")]
-    [InlineData("", "msg")]
-    [InlineData("author", "")]
-    [InlineData("", "")]
-    public async Task Invalid_Payload(string author, string message)
-    {
-        var resp = await _client.PostAsJsonAsync(SingleCheepPostRoute,
-            new CheepCreateRequest(author, message));
-        resp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    [Fact(DisplayName = "List cheeps returns OK and JSON body")]
-    public async Task List_Cheeps()
-    {
-        var resp = await _client.GetAsync(CheepsListRoute);
-
-        resp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var raw = await resp.Content.ReadAsStringAsync();
-        raw.Should().NotBeNullOrWhiteSpace();
-    }
-
-    [Fact(DisplayName = "Public time HTML contains Helge's cheep")]
+    [Fact(DisplayName = "Public timeline HTML contains Helge's cheep")]
     public async Task PublicTimeline_HtmlContainsHelgeCheep()
     {
         var resp = await _client.GetAsync("/");
@@ -128,5 +73,29 @@ public class End2EndTests
         var html = await resp.Content.ReadAsStringAsync();
         html.Should().Contain("Adrian");
         html.Should().Contain("Hej, velkommen til kurset.");
+    }
+
+    [Fact(DisplayName = "Public timeline returns OK and HTML content")]
+    public async Task PublicTimeline_ReturnsHtml()
+    {
+        var resp = await _client.GetAsync("/");
+        
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var contentType = resp.Content.Headers.ContentType?.MediaType;
+        contentType.Should().Be("text/html");
+        
+        var html = await resp.Content.ReadAsStringAsync();
+        html.Should().NotBeNullOrWhiteSpace();
+        html.Should().Contain("Chirp!");
+    }
+
+    [Fact(DisplayName = "User timeline with pagination works")]
+    public async Task UserTimeline_WithPagination()
+    {
+        var resp = await _client.GetAsync("/Helge?page=1");
+        
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = await resp.Content.ReadAsStringAsync();
+        html.Should().Contain("Helge");
     }
 }

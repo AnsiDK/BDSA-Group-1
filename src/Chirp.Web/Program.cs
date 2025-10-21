@@ -12,12 +12,6 @@ var dbPath = string.IsNullOrWhiteSpace(overridePath)
     ? Path.Combine(Path.GetTempPath(), "chirp.db")
     : Path.GetFullPath(overridePath);
 
-// Delete the database file if it exists
-if (File.Exists(dbPath))
-{
-    File.Delete(dbPath);
-}
-
 // Make sure directory exists
 Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
@@ -57,3 +51,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapRazorPages();
 app.Run();
+
+// Make the implicit Program class public for testing
+public partial class Program { }

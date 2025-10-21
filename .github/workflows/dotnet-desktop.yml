@@ -28,19 +28,19 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 9.x
 
     - name: Restore dependencies
-      run: dotnet restore src/Chirp.Razor/Chirp.Razor.csproj
+      run: dotnet restore Chirp!.sln
 
     - name: Build
-      run: dotnet build src/Chirp.Razor/Chirp.Razor.csproj --configuration Release --no-restore
+      run: dotnet build Chirp!.sln --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test src/Chirp.Razor/Chirp.Razor.csproj --configuration Release --no-build --verbosity normal
+      run: dotnet test test/test.csproj --configuration Release --no-build --verbosity normal
 
     - name: Publish single-file executable
-      run: dotnet publish src/Chirp.Razor/Chirp.Razor.csproj -c Release -r ${{ matrix.rid }} -p:PublishSingleFile=true --no-self-contained -o publish/${{ matrix.rid }}
+      run: dotnet publish src/Chirp.Web/Chirp.Web.csproj -c Release -r ${{ matrix.rid }} -p:PublishSingleFile=true --no-self-contained -o publish/${{ matrix.rid }}
 
     - name: Zip output
       if: runner.os != 'Windows'

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Chirp.LocalServer;
 
-public class TestWebApplicationFactory : WebApplicationFactory<Chirp.WebApi.Program>
+public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
     private IHost? _host;
 
