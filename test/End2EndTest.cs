@@ -56,7 +56,7 @@ public class End2EndTests
     [Fact(DisplayName = "Public timeline HTML contains Helge's cheep")]
     public async Task PublicTimeline_HtmlContainsHelgeCheep()
     {
-        var resp = await _client.GetAsync("/");
+        var resp = await _client.GetAsync("/?page=21");
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var html = await resp.Content.ReadAsStringAsync();
