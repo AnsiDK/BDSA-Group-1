@@ -31,10 +31,10 @@ jobs:
         dotnet-version: 8.x
 
     - name: Restore dependencies
-      run: dotnet restore Chirp!.sln
+      run: dotnet restore Chirp.sln
 
     - name: Build
-      run: dotnet build Chirp!.sln --configuration Release --no-restore
+      run: dotnet build Chirp.sln --configuration Release --no-restore
 
     - name: Test
       run: dotnet test test/test.csproj --configuration Release --no-build --verbosity normal
