@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 using Xunit.Abstractions;
+using Microsoft.Data.Sqlite;
 
 namespace Chirp.E2E;
 
@@ -16,6 +17,9 @@ public class TestFixture : IDisposable
     private readonly WebApplicationFactory<Program>? _factory;
     public HttpClient Client { get; }
 
+    private SqliteConnection? _connection;
+
+    // Replace constructor body with:
     public TestFixture()
     {
         var external = Environment.GetEnvironmentVariable("TEST_BASEURL");
@@ -25,8 +29,37 @@ public class TestFixture : IDisposable
         }
         else
         {
-            // Use in-process hosting
-            _factory = new WebApplicationFactory<Program>();
+            // Create a single in-memory Sqlite connection and keep it open for the test lifetime
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
+
+            _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    // Replace the app's DbContext registration.
+                    // Replace 'ChirpDbContext' below with your actual DbContext type.
+                    var descriptor = services.SingleOrDefault(d =>
+                        d.ServiceType == typeof(DbContextOptions<ChirpDbContext>));
+                    if (descriptor != null) services.Remove(descriptor);
+
+                    services.AddDbContext<ChirpDbContext>(options =>
+                    {
+                        options.UseSqlite(_connection);
+                    });
+
+                    // Build a provider to initialize the database (apply migrations / seed)
+                    var sp = services.BuildServiceProvider();
+                    using var scope = sp.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+
+                    // Apply migrations (use Migrate rather than EnsureCreated to keep schema and migrations consistent)
+                    db.Database.Migrate();
+
+                    // Optionally run your seeding code here if needed.
+                });
+            });
+
             Client = _factory.CreateClient();
         }
     }
@@ -35,6 +68,9 @@ public class TestFixture : IDisposable
     {
         Client.Dispose();
         _factory?.Dispose();
+
+        _connection?.Close();
+        _connection?.Dispose();
     }
 }
 
