@@ -34,5 +34,5 @@ public class CheepService : ICheepService
     }
 
     private static string FormatTs(DateTime dtUtc)
-        => dtUtc.ToUniversalTime().ToString("HH:mm:ss MMM dd yyyy", CultureInfo.InvariantCulture);
+        => dtUtc.ToUniversalTime().ToString("HH:mm:ss dd MMM yyyy", CultureInfo.InvariantCulture);  // MMM = Oct, MMMM = October, yyyy = 2025, yy = 25
 }

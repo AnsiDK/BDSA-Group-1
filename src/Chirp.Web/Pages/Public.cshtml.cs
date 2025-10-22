@@ -16,7 +16,7 @@ public class PublicModel : PageModel
         _service = service;
     }
 
-    public ActionResult OnGet(int page = 1)
+    public ActionResult OnGet([FromQuery] int page = 1)
     {
         if (page < 1) page = 1;
         

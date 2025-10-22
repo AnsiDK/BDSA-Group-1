@@ -17,7 +17,7 @@ public class UserTimelineModel : PageModel
         _service = service;
     }
 
-    public ActionResult OnGet(string author, int page = 1)
+    public ActionResult OnGet(string author, [FromQuery] int page = 1)
     {
         if (page < 1) page = 1;
         
