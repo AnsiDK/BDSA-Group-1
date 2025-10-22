@@ -30,6 +30,9 @@ jobs:
       with:
         dotnet-version: 9.x
 
+    - name: List current directory
+      run: pwd && ls -R
+    
     - name: Restore dependencies
       run: dotnet restore Chirp.sln
 
