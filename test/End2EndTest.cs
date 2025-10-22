@@ -4,7 +4,12 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Chirp.Infrastructure.Data;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -13,7 +18,7 @@ namespace Chirp.E2E;
 // Shared fixture
 public class TestFixture : IDisposable
 {
-    private readonly WebApplicationFactory<Program>? _factory;
+    private readonly CustomWebAppFactory? _factory;
     public HttpClient Client { get; }
 
     public TestFixture()
@@ -25,8 +30,8 @@ public class TestFixture : IDisposable
         }
         else
         {
-            // Use in-process hosting
-            _factory = new WebApplicationFactory<Program>();
+            // Use in-process hosting with SQLite in-memory database
+            _factory = new CustomWebAppFactory();
             Client = _factory.CreateClient();
         }
     }
@@ -35,6 +40,80 @@ public class TestFixture : IDisposable
     {
         Client.Dispose();
         _factory?.Dispose();
+    }
+
+    // Custom factory that wires up EF Core to an in-memory SQLite database
+    private sealed class CustomWebAppFactory : WebApplicationFactory<Program>
+    {
+        private SqliteConnection? _connection;
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            // Ensure the app runs under the 'Testing' environment so Program.cs can skip migrations
+            builder.UseEnvironment("Testing");
+
+            builder.ConfigureServices(services =>
+            {
+                // Remove the app's ChirpDbContext registration
+                var descriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions<ChirpDbContext>));
+                if (descriptor is not null)
+                {
+                    services.Remove(descriptor);
+                }
+
+                // Keep a single open connection for the lifetime of the factory
+                _connection = new SqliteConnection("DataSource=:memory:");
+                _connection.Open();
+
+                services.AddDbContext<ChirpDbContext>(options =>
+                    options.UseSqlite(_connection));
+
+                // Build the service provider, create the database schema, and seed minimal test data
+                var sp = services.BuildServiceProvider();
+                using var scope = sp.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+
+                // EnsureCreated avoids migrations and the __EFMigrationsHistory table
+                db.Database.EnsureCreated();
+
+                // Seed only what's needed for tests to run
+                if (!db.Authors.Any() && !db.Cheeps.Any())
+                {
+                    var helge = new Chirp.Core.Entities.Author { Name = "Helge", Email = "ropf@itu.dk" };
+                    var adrian = new Chirp.Core.Entities.Author { Name = "Adrian", Email = "adho@itu.dk" };
+
+                    db.Authors.AddRange(helge, adrian);
+                    db.SaveChanges();
+
+                    db.Cheeps.AddRange(
+                        new Chirp.Core.Entities.Cheep
+                        {
+                            Text = "Hello, BDSA students!",
+                            Timestamp = DateTime.UtcNow,
+                            AuthorId = helge.AuthorId
+                        },
+                        new Chirp.Core.Entities.Cheep
+                        {
+                            Text = "Hej, velkommen til kurset.",
+                            Timestamp = DateTime.UtcNow,
+                            AuthorId = adrian.AuthorId
+                        }
+                    );
+                    db.SaveChanges();
+                }
+            });
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            if (disposing)
+            {
+                _connection?.Dispose();
+                _connection = null;
+            }
+        }
     }
 }
 

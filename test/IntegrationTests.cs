@@ -1,8 +1,7 @@
-using Chirp.LocalServer;
 using System.Net;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
+using Chirp.E2E;
 
 namespace Chirp.IntegratedTests;
 
@@ -10,13 +9,15 @@ namespace Chirp.IntegratedTests;
 // The new Razor Pages application doesn't expose API endpoints - it serves HTML pages.
 // For web app testing, use End2EndTests.cs which tests the HTML pages.
 
-public class IntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+// Reuse the same in-memory SQLite web app fixture as E2E tests
+[Collection("E2E")]
+public class IntegrationTests
 {
     private readonly HttpClient _client;
 
-    public IntegrationTests(WebApplicationFactory<Program> factory)
+    public IntegrationTests(TestFixture fx)
     {
-        _client = factory.CreateClient();
+        _client = fx.Client;
     }
 
     [Fact]

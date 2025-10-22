@@ -30,13 +30,15 @@ builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
 var app = builder.Build();
 
-// Apply pending migrations automatically (or switch to EnsureCreated for a quick start)
-using (var scope = app.Services.CreateScope())
+// Apply pending migrations automatically (skip during testing)
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
-    db.Database.Migrate();
-
-    DbInitializer.SeedDatabase(db);
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+        db.Database.Migrate();
+        DbInitializer.SeedDatabase(db);
+    }
 }
 
 // Pipeline
