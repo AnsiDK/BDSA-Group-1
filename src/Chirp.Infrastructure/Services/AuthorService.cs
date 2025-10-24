@@ -3,7 +3,7 @@ using Chirp.Core.Interfaces;
 using System.Globalization;
 using Chirp.Core.Entities;
 
-namespace Chirp.Infrastructure.Services.AuthorService;
+namespace Chirp.Infrastructure.Services;
 
 public class AuthorService : IAuthorService
 {

@@ -3,12 +3,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Chirp.Infrastructure.Data;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Chirp.E2E;
+namespace Chirp.test;
 
 // Shared fixture
 public class TestFixture : IDisposable
@@ -28,6 +31,7 @@ public class TestFixture : IDisposable
             // Use in-process hosting
             _factory = new WebApplicationFactory<Program>();
             Client = _factory.CreateClient();
+            EnsureHelgeCheepIsRecent();
         }
     }
 
@@ -35,6 +39,29 @@ public class TestFixture : IDisposable
     {
         Client.Dispose();
         _factory?.Dispose();
+    }
+
+    private void EnsureHelgeCheepIsRecent()
+    {
+        if (_factory is null)
+        {
+            return;
+        }
+
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+
+        var helgeCheep = db.Cheeps
+            .Include(c => c.Author)
+            .FirstOrDefault(c => c.Author.Name == "Helge" && c.Text == "Hello, BDSA students!");
+
+        if (helgeCheep is null)
+        {
+            return;
+        }
+
+        helgeCheep.Timestamp = DateTime.UtcNow;
+        db.SaveChanges();
     }
 }
 

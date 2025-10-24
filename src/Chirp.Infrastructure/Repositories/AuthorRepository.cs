@@ -4,7 +4,7 @@ using Chirp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace AuthorRepository;
+namespace Chirp.Infrastructure.Repositories;
 
 public class AuthorRepository : IAuthorRepository
 {
