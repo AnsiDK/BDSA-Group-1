@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Chirp.Tests;
+namespace Chirp.tests;
 
 // Note: These tests were for the old CLI application which has been replaced
 // by a Razor Pages web application in the new Onion Architecture.

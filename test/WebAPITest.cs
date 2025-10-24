@@ -6,7 +6,7 @@ using Xunit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Chirp.WebApi;
+namespace Chirp.test;
 
 // Note: These tests were for the old WebApi project which has been replaced
 // by a Razor Pages web application in the new Onion Architecture.
