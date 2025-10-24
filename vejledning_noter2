@@ -1,0 +1,45 @@
+Feature branches:
+- Husk at slette branches.
+
+Issues skal skrives som user stories. Hvis der ikke er et acceptance criteria, så skal der laves et. Ikke "det skal være bedre" men fx "der skal være 3 unit tests".
+
+
+Release:
+- Lav et build så navnet ikke bliver autogenereret. Meget lille ting, men nice.
+
+Project board:
+- Sørg for aktivt at issues bevæger sig langs boardet. Kan med fordel lave et git workflow. Kan lave tags/labels der hedder to-do eller finish, så de bevæger sig automatisk.
+
+Code reviews:
+- Commits til feature branches skal være småt. Hurtigt merge. 
+
+Peer programming:
+- Prøv at brug det på de flere komplekse problemer. 
+
+Chirp.CLI:
+- Er blevet benchet og er færdige med.
+- Ind og fjern RazorPage mappen på Chirp.CLI branchen, og stadig se om det virker. 
+RazorPage:
+- Det nye project vi arbejder på.
+
+
+Softwaredelen:
+- I vores src skal core- og webinfrastructure mapperne ligge.
+- Slet test mappe som ikke bliver brugt.
+
+
+Kodedelen:
+- Godt med, og de rigtige ting ligger hvor de skal.
+- Skal dele cheep og author repository op i to forskellige repositories. Tilhørende til dem skal der være en author service og interfaces. Nem er skallere fx achievement repository osv.
+- Læs warnings og fix dem. Super nice der står 0 warnings. 
+
+Unittests:
+- Savner at se dem. Lav en test for hver metode i repositories.
+- End2endtest og integrationtest er godt med. Integrationtest kunne tjekke hvis der er 40 cheeps at side 1 har 32 cheeps og side 2 har 8 cheeps. End2endtest fint.
+
+Yderligere kommentarer:
+- Co-authoring er vigtigt at huske. Også vigtigt hvis man henter kode et andet sted fra online at skrive co-author på eller ai. 
+- Licens som står ud (Kommer ikke til at være noget hvor at vælge en license fucker os over):
+  - MIT License er fint. Virker oplagt at vælge her.
+- Få lavet en README fil. En link til hjemmesiden, og hvis en lige er gået ind på vores github, hvad skal der så gøres for at køre programmet? Step by step guide. 
+- Få lavet både oauth og identity til at hjælpe med at logge ind. Et kapitel i bogen beskriver hvordan man laver identity.
