@@ -1,6 +1,7 @@
 using Chirp.Core.DTOs;
 using Chirp.Core.Interfaces;
 using System.Globalization;
+using Chirp.Core.Entities;
 
 namespace Chirp.Infrastructure.Services.AuthorService;
 
@@ -15,12 +16,17 @@ public class AuthorService : IAuthorService
 
     public AuthorDTO? GetAuthorByName(string name)
     {
-        return _repo.GetAuthorByName(name);
+        return AuthorDTO(_repo.GetAuthorByName(name));
+    }
+
+    private AuthorDTO? AuthorDTO(Author? author)
+    {
+        throw new NotImplementedException();
     }
 
     public AuthorDTO? GetAuthorByEmail(string email)
     {
-        return _repo.GetAuthorByEmail(email);
+        return AuthorDTO(_repo.GetAuthorByEmail(email));
     }
 
     public void AddAuthor(Author author)
