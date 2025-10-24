@@ -1,7 +1,6 @@
 using Chirp.Core.Entities;
-using Chirp.Core.DTOs;
 
-namespace Chirp.Core.Interfaces;
+namespace IAuthorService;
 
 public interface IAuthorService
 {
