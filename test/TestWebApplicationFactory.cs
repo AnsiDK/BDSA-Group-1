@@ -58,7 +58,18 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         base.Dispose(disposing);
         if (disposing && File.Exists(_dbPath))
         {
-            File.Delete(_dbPath);
+            try
+            {
+                File.Delete(_dbPath);
+            }
+            catch (IOException)
+            {
+                // SQLite can keep the file locked on some platforms; ignore cleanup failure.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Ignore inability to delete temp file in CI environments.
+            }
         }
     }
 }
