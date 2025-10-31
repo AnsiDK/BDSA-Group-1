@@ -15,6 +15,9 @@ public class WebAppFactory : WebApplicationFactory<Chirp.Web.Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Set environment to "Testing" so Program.cs skips migrations/seeding
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureLogging(logging =>
         {
             // Remove EF Core info logs that flood the console
@@ -30,26 +33,25 @@ public class WebAppFactory : WebApplicationFactory<Chirp.Web.Program>
             if (descriptor != null)
                 services.Remove(descriptor);
 
-            // Create a single in-memory SQLite connection to share across the test run
+            // Create a single in-memory SQLite connection
             _connection = new SqliteConnection("DataSource=:memory:");
             _connection.Open();
 
             services.AddDbContext<ChirpDbContext>(options =>
             {
                 options.UseSqlite(_connection);
-                // Optional: disable detailed EF Core logging
                 options.EnableSensitiveDataLogging(false);
             });
 
-            // Build the service provider and initialize the database
+            // Build service provider and initialize the DB
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
 
-            // Ensure schema is created (safe for in-memory tests)
+            // Ensure schema is created safely
             db.Database.EnsureCreated();
 
-            // Seed the database
+            // Seed the DB
             DbInitializer.SeedDatabase(db);
         });
     }
