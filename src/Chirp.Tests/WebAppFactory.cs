@@ -38,7 +38,7 @@ public class WebAppFactory : WebApplicationFactory<Chirp.Web.Program>, IDisposab
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
 
-            db.Database.EnsureCreated();
+            db.Database.Migrate();
             DbInitializer.SeedDatabase(db);
         });
 
