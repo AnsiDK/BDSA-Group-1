@@ -34,9 +34,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
-    db.Database.Migrate();
 
-    DbInitializer.SeedDatabase(db);
+    if (!app.Environment.IsEnvironment("Testing"))
+    {
+        db.Database.Migrate();
+        DbInitializer.SeedDatabase(db);
+    }
 }
 
 // Pipeline
